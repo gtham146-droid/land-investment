@@ -3,409 +3,289 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Land Investment Portfolio - Cloud Enabled</title>
+    <title>Land Investment Portfolio</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --sidebar-bg: #ffffff;
+            --main-bg: #f8f9fa;
+            --primary: #10b981;
+            --primary-light: #d1fae5;
+            --secondary: #6366f1;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --border: #e5e7eb;
+            --card-bg: #ffffff;
+            --hover: #f3f4f6;
+            --danger: #ef4444;
         }
-
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--main-bg);
+            color: var(--text-dark);
+            display: flex;
             min-height: 100vh;
-            padding: 20px;
         }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .setup-container {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 700px;
-            margin: 50px auto;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-
-        .setup-container h1 {
-            text-align: center;
-            color: #667eea;
-            margin-bottom: 20px;
-        }
-
-        .setup-steps {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 12px;
-            margin: 20px 0;
-        }
-
-        .setup-steps ol {
-            margin-left: 20px;
-        }
-
-        .setup-steps li {
-            margin: 10px 0;
-            line-height: 1.6;
-        }
-
-        .setup-steps code {
-            background: #e0e0e0;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-        }
-
-        .login-container {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 400px;
-            margin: 100px auto;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            padding: 24px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
             display: none;
         }
-
-        .login-container h1 {
-            text-align: center;
-            color: #667eea;
-            margin-bottom: 30px;
+        
+        .sidebar.active { display: block; }
+        
+        .logo {
+            padding: 0 20px;
+            margin-bottom: 32px;
         }
-
-        .form-group {
-            margin-bottom: 20px;
+        
+        .logo h2 {
+            font-size: 18px;
+            color: var(--text-dark);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 500;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        button {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
+        
+        .nav-item {
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-light);
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
         }
-
-        button:hover {
-            transform: translateY(-2px);
+        
+        .nav-item:hover {
+            background: var(--hover);
+            color: var(--text-dark);
         }
-
-        button:active {
-            transform: translateY(0);
+        
+        .nav-item.active {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 600;
         }
-
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
+        
+        .nav-icon {
+            font-size: 20px;
+            width: 20px;
+            text-align: center;
         }
-
-        .dashboard {
-            display: none;
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 0;
+            padding: 24px;
+            transition: margin-left 0.3s;
         }
-
-        .header {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        
+        .main-content.shifted {
+            margin-left: 260px;
+        }
+        
+        /* Top Bar */
+        .topbar {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
-
-        .header h1 {
-            color: #667eea;
+        
+        .topbar h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-dark);
         }
-
-        .header-actions {
+        
+        .topbar-actions {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             align-items: center;
         }
-
-        .sync-status {
+        
+        .btn {
             padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 12px;
+            border-radius: 8px;
+            border: none;
+            font-size: 13px;
             font-weight: 600;
-        }
-
-        .sync-success {
-            background: #e8f5e9;
-            color: #388e3c;
-        }
-
-        .sync-error {
-            background: #ffebee;
-            color: #c62828;
-        }
-
-        .sync-loading {
-            background: #fff3e0;
-            color: #f57c00;
-        }
-
-        .user-info {
-            display: flex;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
             align-items: center;
-            gap: 15px;
+            gap: 6px;
         }
-
-        .logout-btn, .sync-btn {
-            width: auto;
-            padding: 10px 20px;
-            font-size: 14px;
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
         }
-
-        .sync-btn {
-            background: #4caf50;
+        
+        .btn-primary:hover {
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
-
+        
+        .btn-secondary {
+            background: var(--hover);
+            color: var(--text-dark);
+        }
+        
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        
+        .btn-icon {
+            padding: 8px;
+            border-radius: 8px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-icon:hover {
+            background: var(--hover);
+            border-color: var(--text-light);
+        }
+        
+        /* Stats Cards */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
-
+        
         .stat-card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
         }
-
-        .stat-card h3 {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 10px;
+        
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            font-weight: 500;
         }
-
-        .stat-card .value {
-            font-size: 32px;
+        
+        .stat-value {
+            font-size: 28px;
             font-weight: 700;
-            color: #667eea;
+            color: var(--text-dark);
         }
-
-        .tabs {
-            display: flex;
-            gap: 10px;
+        
+        /* Content Card */
+        .content-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
             margin-bottom: 20px;
-            background: white;
-            padding: 10px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            flex-wrap: wrap;
         }
-
-        .tab {
-            padding: 12px 24px;
-            background: transparent;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            color: #666;
-            transition: all 0.3s;
-        }
-
-        .tab.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .plot-grid {
-            display: grid;
-            gap: 20px;
-        }
-
-        .plot-card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-
-        .plot-header {
+        
+        .card-header {
             display: flex;
             justify-content: space-between;
-            align-items: start;
+            align-items: center;
             margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
         }
-
-        .plot-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #333;
-        }
-
-        .plot-subtitle {
-            font-size: 14px;
-            color: #666;
-            margin-top: 5px;
-        }
-
-        .status-badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .status-available { background: #e3f2fd; color: #1976d2; }
-        .status-documentation { background: #fff3e0; color: #f57c00; }
-        .status-owned { background: #e8f5e9; color: #388e3c; }
-        .status-marketing { background: #f3e5f5; color: #7b1fa2; }
-        .status-sold { background: #fce4ec; color: #c2185b; }
-
-        .plot-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .detail-item {
-            padding: 10px;
-            background: #f5f5f5;
-            border-radius: 8px;
-        }
-
-        .detail-label {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 4px;
-        }
-
-        .detail-value {
+        
+        .card-title {
             font-size: 16px;
             font-weight: 600;
-            color: #333;
+            color: var(--text-dark);
         }
-
-        .plot-images {
-            display: flex;
-            gap: 10px;
-            margin: 15px 0;
-            flex-wrap: wrap;
-        }
-
-        .plot-image {
-            width: 120px;
-            height: 120px;
-            border-radius: 8px;
-            object-fit: cover;
-            cursor: pointer;
-            border: 2px solid #e0e0e0;
-        }
-
-        .plot-image:hover {
-            border-color: #667eea;
-        }
-
-        .location-map {
+        
+        /* Table */
+        table {
             width: 100%;
-            height: 200px;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background: var(--main-bg);
             border-radius: 8px;
-            margin: 15px 0;
-            border: 2px solid #e0e0e0;
         }
-
-        .investors-list {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 2px solid #f0f0f0;
-        }
-
-        .investor-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-        }
-
-        .timeline {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 2px solid #f0f0f0;
-        }
-
-        .timeline-item {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
-            padding: 15px;
-            background: #f9f9f9;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-        }
-
-        .timeline-date {
+        
+        th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-light);
             font-size: 12px;
-            color: #666;
-            min-width: 100px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-
-        .timeline-content {
-            flex: 1;
-        }
-
-        .timeline-title {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 4px;
-        }
-
-        .timeline-desc {
+        
+        td {
+            padding: 14px 12px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-dark);
             font-size: 14px;
-            color: #666;
         }
-
-        .timeline-amount {
+        
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tbody tr:hover {
+            background: var(--hover);
+        }
+        
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
             font-weight: 600;
-            color: #667eea;
+            display: inline-block;
         }
-
+        
+        .status-available { background: #dbeafe; color: #1e40af; }
+        .status-documentation { background: #fef3c7; color: #92400e; }
+        .status-owned { background: #d1fae5; color: #065f46; }
+        .status-marketing { background: #e9d5ff; color: #6b21a8; }
+        .status-sold { background: #fce7f3; color: #9f1239; }
+        
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -414,770 +294,625 @@
             right: 0;
             bottom: 0;
             background: rgba(0,0,0,0.5);
-            z-index: 1000;
+            z-index: 2000;
             padding: 20px;
             overflow-y: auto;
         }
-
+        
         .modal-content {
             background: white;
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 700px;
-            margin: 50px auto;
-            max-height: 90vh;
-            overflow-y: auto;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 600px;
+            margin: 40px auto;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
         }
-
+        
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
         }
-
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
         .close-btn {
             background: none;
             border: none;
-            font-size: 28px;
+            font-size: 24px;
+            color: var(--text-light);
             cursor: pointer;
-            color: #666;
-            width: auto;
-            padding: 0;
-        }
-
-        .btn-secondary {
-            background: #e0e0e0;
-            color: #333;
-            margin-top: 10px;
-        }
-
-        .btn-small {
-            width: auto;
-            padding: 8px 16px;
-            font-size: 14px;
-            margin-top: 0;
-        }
-
-        .btn-group {
+            width: 32px;
+            height: 32px;
             display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
         }
-
-        .btn-group button {
-            flex: 1;
-            min-width: 150px;
+        
+        .close-btn:hover {
+            background: var(--hover);
+            color: var(--text-dark);
         }
-
-        .success-message, .error-message {
-            padding: 15px;
+        
+        /* Form */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
             border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.2s;
         }
-
-        .success-message {
-            background: #4caf50;
-            color: white;
+        
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
         }
-
-        .error-message {
-            background: #f44336;
-            color: white;
-        }
-
+        
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 12px;
         }
-
-        .payment-list {
-            margin-top: 15px;
-        }
-
-        .payment-item {
+        
+        /* Login */
+        .login-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 12px;
-            background: #f5f5f5;
-            border-radius: 8px;
+            justify-content: center;
+            z-index: 3000;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+        
+        .login-card h1 {
+            text-align: center;
+            color: var(--text-dark);
             margin-bottom: 8px;
+            font-size: 24px;
         }
-
-        .email-preview {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 15px;
-            border: 1px solid #e0e0e0;
+        
+        .login-card p {
+            text-align: center;
+            color: var(--text-light);
+            margin-bottom: 32px;
+            font-size: 14px;
         }
-
-        .email-header {
-            border-bottom: 1px solid #e0e0e0;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+        
+        .setup-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
         }
-
-        .alert-box {
-            background: #fff3cd;
-            border: 1px solid #ffc107;
-            color: #856404;
-            padding: 15px;
+        
+        .setup-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .setup-link a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Messages */
+        .message {
+            padding: 12px 16px;
             border-radius: 8px;
             margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            display: none;
         }
-
+        
+        .message-success {
+            background: var(--primary-light);
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        
+        .message-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-light);
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
         @media (max-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-            
-            .plot-details {
-                grid-template-columns: 1fr;
-            }
-
-            .header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .header-actions {
-                width: 100%;
-                justify-content: space-between;
-            }
+            .sidebar { width: 100%; position: relative; }
+            .main-content { margin-left: 0 !important; }
+            .form-row { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <!-- Setup Screen -->
-    <div id="setupScreen" class="setup-container">
-        <h1>🚀 Google Sheets Setup</h1>
-        
-        <div class="alert-box">
-            <strong>⚠️ First Time Setup Required</strong><br>
-            Follow these steps to connect your Google Sheet for data storage.
-        </div>
-
-        <div class="setup-steps">
-            <h3>Step 1: Create Your Google Sheet</h3>
-            <ol>
-                <li>Go to <a href="https://sheets.google.com" target="_blank">Google Sheets</a></li>
-                <li>Create a new blank spreadsheet</li>
-                <li>Name it "Land Investment Data"</li>
-                <li>Create two sheets (tabs at bottom):
-                    <ul>
-                        <li><code>Plots</code> - for plot data</li>
-                        <li><code>Payments</code> - for payment transactions</li>
-                    </ul>
-                </li>
-            </ol>
-
-            <h3 style="margin-top: 20px;">Step 2: Set Up Google Apps Script</h3>
-            <ol>
-                <li>In your spreadsheet, click <strong>Extensions → Apps Script</strong></li>
-                <li>Delete any existing code</li>
-                <li>Copy and paste this code:</li>
-            </ol>
-            
-            <textarea readonly style="width: 100%; height: 200px; font-family: monospace; font-size: 12px; margin: 10px 0;">
-function doGet(e) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet();
-  const action = e.parameter.action;
-  
-  if (action === 'getPlots') {
-    const plotsSheet = sheet.getSheetByName('Plots');
-    if (!plotsSheet) return ContentService.createTextOutput(JSON.stringify({error: 'Plots sheet not found'}));
-    const data = plotsSheet.getDataRange().getValues();
-    return ContentService.createTextOutput(JSON.stringify({plots: data})).setMimeType(ContentService.MimeType.JSON);
-  }
-  
-  if (action === 'getPayments') {
-    const paymentsSheet = sheet.getSheetByName('Payments');
-    if (!paymentsSheet) return ContentService.createTextOutput(JSON.stringify({error: 'Payments sheet not found'}));
-    const data = paymentsSheet.getDataRange().getValues();
-    return ContentService.createTextOutput(JSON.stringify({payments: data})).setMimeType(ContentService.MimeType.JSON);
-  }
-  
-  return ContentService.createTextOutput(JSON.stringify({error: 'Invalid action'}));
-}
-
-function doPost(e) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet();
-  const data = JSON.parse(e.postData.contents);
-  
-  if (data.action === 'savePlots') {
-    const plotsSheet = sheet.getSheetByName('Plots');
-    plotsSheet.clear();
-    plotsSheet.getRange(1, 1, data.plots.length, data.plots[0].length).setValues(data.plots);
-    return ContentService.createTextOutput(JSON.stringify({success: true})).setMimeType(ContentService.MimeType.JSON);
-  }
-  
-  if (data.action === 'savePayments') {
-    const paymentsSheet = sheet.getSheetByName('Payments');
-    paymentsSheet.clear();
-    paymentsSheet.getRange(1, 1, data.payments.length, data.payments[0].length).setValues(data.payments);
-    return ContentService.createTextOutput(JSON.stringify({success: true})).setMimeType(ContentService.MimeType.JSON);
-  }
-  
-  return ContentService.createTextOutput(JSON.stringify({error: 'Invalid action'}));
-}
-            </textarea>
-
-            <h3 style="margin-top: 20px;">Step 3: Deploy the Script</h3>
-            <ol>
-                <li>Click <strong>Deploy → New deployment</strong></li>
-                <li>Click the gear icon ⚙️ next to "Select type"</li>
-                <li>Choose <strong>Web app</strong></li>
-                <li>Set:
-                    <ul>
-                        <li>Description: "Land Investment API"</li>
-                        <li>Execute as: <strong>Me</strong></li>
-                        <li>Who has access: <strong>Anyone</strong></li>
-                    </ul>
-                </li>
-                <li>Click <strong>Deploy</strong></li>
-                <li>Click <strong>Authorize access</strong> and approve</li>
-                <li><strong>Copy the Web app URL</strong> (looks like: https://script.google.com/...)</li>
-            </ol>
-        </div>
-
-        <div class="form-group" style="margin-top: 30px;">
-            <label>Paste Your Web App URL Here:</label>
-            <input type="text" id="apiUrl" placeholder="https://script.google.com/macros/s/...">
-        </div>
-
-        <button onclick="saveApiUrl()">Save & Continue</button>
-        
-        <div style="margin-top: 20px; text-align: center;">
-            <button onclick="skipSetup()" class="btn-secondary">Skip Setup (Use Demo Mode)</button>
-        </div>
-    </div>
-
     <!-- Login Screen -->
     <div id="loginScreen" class="login-container">
-        <h1>🏞️ Land Investment Portal</h1>
-        <div class="form-group">
-            <label>Login As:</label>
-            <select id="userSelect">
-                <option value="">Select User...</option>
-                <option value="admin">Admin (You)</option>
-                <option value="investor1">Investor - Rajesh Kumar</option>
-                <option value="investor2">Investor - Priya Sharma</option>
-                <option value="investor3">Investor - Amit Patel</option>
-            </select>
+        <div class="login-card">
+            <h1>🏞️ Land Investment</h1>
+            <p>Welcome back! Please login to continue</p>
+            
+            <div id="loginError" class="message message-error" style="margin-bottom: 16px;"></div>
+            
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                <input type="text" id="loginUsername" class="form-input" placeholder="Enter username" autocomplete="username">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" id="loginPassword" class="form-input" placeholder="Enter password" autocomplete="current-password">
+            </div>
+            
+            <button onclick="login()" class="btn btn-primary" style="width: 100%; margin-top: 8px;">
+                Login →
+            </button>
+            
+            <div class="setup-link">
+                <a href="#" onclick="resetSetup(); return false;">⚙️ Change Google Sheets Settings</a>
+            </div>
         </div>
-        <button onclick="login()">Login</button>
     </div>
 
-    <!-- Dashboard -->
-    <div id="dashboard" class="dashboard container">
-        <div class="header">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo">
+            <h2>🏞️ LandInvest</h2>
+        </div>
+        
+        <div id="sidebarNav"></div>
+        
+        <div style="position: absolute; bottom: 20px; left: 0; right: 0; padding: 0 20px;">
+            <button class="nav-item" onclick="changeAdminPassword()" id="changePasswordBtn" style="display: none; margin-bottom: 8px;">
+                <span class="nav-icon">🔑</span>
+                Change Password
+            </button>
+            <button class="nav-item" onclick="logout()" style="color: var(--danger);">
+                <span class="nav-icon">🚪</span>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="topbar">
             <div>
-                <h1 id="dashboardTitle">Dashboard</h1>
-                <p id="userName" style="color: #666; margin-top: 5px;"></p>
+                <h1 id="pageTitle">Dashboard</h1>
+                <p style="color: var(--text-light); font-size: 14px; margin-top: 4px;" id="pageSubtitle"></p>
             </div>
-            <div class="header-actions">
-                <div id="syncStatus" class="sync-status sync-success" style="display: none;">
-                    ✓ Synced
-                </div>
-                <button class="sync-btn" onclick="syncData()" id="syncButton">
-                    🔄 Sync with Google Sheets
+            <div class="topbar-actions">
+                <div id="syncStatus" class="message" style="margin: 0; padding: 6px 12px; font-size: 12px;"></div>
+                <button class="btn btn-secondary" onclick="syncData()" id="syncBtn">
+                    🔄 Sync
                 </button>
-                <button class="logout-btn" onclick="logout()">Logout</button>
             </div>
         </div>
 
-        <div id="successMessage" class="success-message"></div>
-        <div id="errorMessage" class="error-message"></div>
+        <div id="successMessage" class="message message-success"></div>
+        <div id="errorMessage" class="message message-error"></div>
 
-        <!-- Stats Grid -->
         <div class="stats-grid" id="statsGrid"></div>
-
-        <!-- Tabs -->
-        <div class="tabs" id="tabsContainer"></div>
-
-        <!-- Tab Contents -->
-        <div id="tabContents"></div>
+        
+        <div id="mainContentArea"></div>
     </div>
 
-    <!-- Modals (same as previous version) -->
-    <div id="addPlotModal" class="modal">
+    <!-- Plot Modal -->
+    <div id="plotModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Add New Plot</h2>
-                <button class="close-btn" onclick="closeModal('addPlotModal')">&times;</button>
+                <h2 class="modal-title" id="plotModalTitle">Add New Plot</h2>
+                <button class="close-btn" onclick="closeModal('plotModal')">&times;</button>
             </div>
+            <input type="hidden" id="editPlotId">
             
             <div class="form-row">
                 <div class="form-group">
-                    <label>Plot Name/Location: *</label>
-                    <input type="text" id="plotName" placeholder="e.g., Whitefield Plot A-123">
+                    <label class="form-label">Plot Name *</label>
+                    <input type="text" id="plotName" class="form-input" placeholder="Whitefield Premium">
                 </div>
                 <div class="form-group">
-                    <label>Plot Number: *</label>
-                    <input type="text" id="plotNumber" placeholder="e.g., A-123">
+                    <label class="form-label">Plot Number *</label>
+                    <input type="text" id="plotNumber" class="form-input" placeholder="WF-A-123">
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>Survey Number:</label>
-                    <input type="text" id="surveyNumber" placeholder="e.g., 45/2B">
+                    <label class="form-label">Survey Number</label>
+                    <input type="text" id="surveyNumber" class="form-input" placeholder="45/2B">
                 </div>
                 <div class="form-group">
-                    <label>Document Number:</label>
-                    <input type="text" id="documentNumber" placeholder="e.g., REG-2024-1234">
+                    <label class="form-label">Area (sq ft) *</label>
+                    <input type="number" id="plotArea" class="form-input" placeholder="2400">
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>Area (sq ft): *</label>
-                    <input type="number" id="plotArea" placeholder="e.g., 2400">
+                    <label class="form-label">Price (₹) *</label>
+                    <input type="number" id="plotPrice" class="form-input" placeholder="5000000">
                 </div>
                 <div class="form-group">
-                    <label>Asking Price (₹): *</label>
-                    <input type="number" id="plotPrice" placeholder="e.g., 5000000">
+                    <label class="form-label">Current Owner</label>
+                    <input type="text" id="currentOwner" class="form-input" placeholder="Owner name">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select id="plotStatus" class="form-select">
+                        <option value="available">Available</option>
+                        <option value="documentation">Documentation</option>
+                        <option value="owned">Owned</option>
+                        <option value="marketing">Marketing</option>
+                        <option value="sold">Sold</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Advance Paid (₹)</label>
+                    <input type="number" id="advancePaid" class="form-input" placeholder="0">
                 </div>
             </div>
 
             <div class="form-group">
-                <label>Current Owner:</label>
-                <input type="text" id="currentOwner" placeholder="e.g., Mr. Venkatesh Reddy">
+                <label class="form-label">Description</label>
+                <textarea id="plotDescription" class="form-textarea" rows="3" placeholder="Location details..."></textarea>
             </div>
 
-            <div class="form-group">
-                <label>Location Map URL:</label>
-                <input type="text" id="locationMap" placeholder="Google Maps embed URL (optional)">
-            </div>
-
-            <div class="form-group">
-                <label>Photo URLs (comma-separated):</label>
-                <input type="text" id="plotPhotos" placeholder="https://example.com/photo1.jpg, https://...">
-            </div>
-
-            <div class="form-group">
-                <label>Description:</label>
-                <textarea id="plotDescription" rows="3" placeholder="Location details, amenities, etc."></textarea>
-            </div>
-
-            <button onclick="addPlot()">Add Plot</button>
+            <button onclick="savePlot()" class="btn btn-primary" style="width: 100%;">
+                Save Plot
+            </button>
         </div>
     </div>
 
-    <div id="updatePlotModal" class="modal">
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Update Plot Status</h2>
-                <button class="close-btn" onclick="closeModal('updatePlotModal')">&times;</button>
+                <h2 class="modal-title" id="paymentModalTitle">Add Payment</h2>
+                <button class="close-btn" onclick="closeModal('paymentModal')">&times;</button>
             </div>
-            <input type="hidden" id="updatePlotId">
-            
-            <div class="form-group">
-                <label>Status:</label>
-                <select id="updateStatus" onchange="handleStatusChange()">
-                    <option value="available">Available for Investment</option>
-                    <option value="documentation">Under Documentation</option>
-                    <option value="owned">Owned</option>
-                    <option value="marketing">Marketing</option>
-                    <option value="sold">Sold</option>
-                </select>
-            </div>
-
-            <div id="ownershipFields" style="display: none;">
-                <div class="form-group">
-                    <label>Transfer Ownership To:</label>
-                    <input type="text" id="newOwner" placeholder="New owner name">
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Advance Paid (₹):</label>
-                    <input type="number" id="advancePaid" placeholder="Optional">
-                </div>
-                <div class="form-group">
-                    <label>Balance Paid (₹):</label>
-                    <input type="number" id="balancePaid" placeholder="Optional">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Buying Expenses (₹):</label>
-                <input type="number" id="buyingExpenses" placeholder="Broker, docs, registration, etc.">
-            </div>
-
-            <div id="sellingFields" style="display: none;">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Selling Price (₹):</label>
-                        <input type="number" id="sellingPrice" placeholder="If sold">
-                    </div>
-                    <div class="form-group">
-                        <label>Selling Expenses (₹):</label>
-                        <input type="number" id="sellingExpenses" placeholder="If sold">
-                    </div>
-                </div>
-            </div>
-
-            <button onclick="updatePlot()">Update Plot</button>
-            <button class="btn-secondary" onclick="showEmailNotification()">📧 Preview Email</button>
-        </div>
-    </div>
-
-    <div id="addPaymentModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Add Investor Payment</h2>
-                <button class="close-btn" onclick="closeModal('addPaymentModal')">&times;</button>
-            </div>
+            <input type="hidden" id="editPaymentId">
             <input type="hidden" id="paymentPlotId">
             
+            <div style="background: var(--primary-light); padding: 12px; border-radius: 8px; margin-bottom: 16px;">
+                <div id="plotInfo" style="font-size: 14px; font-weight: 600; color: var(--text-dark);"></div>
+            </div>
+            
             <div class="form-group">
-                <label>Investor:</label>
-                <select id="paymentInvestor">
-                    <option value="investor1">Rajesh Kumar</option>
-                    <option value="investor2">Priya Sharma</option>
-                    <option value="investor3">Amit Patel</option>
+                <label class="form-label">Investor</label>
+                <select id="paymentInvestor" class="form-select">
                 </select>
             </div>
 
-            <div class="form-group">
-                <label>Payment Amount (₹):</label>
-                <input type="number" id="paymentAmount" placeholder="e.g., 500000">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Amount (₹) *</label>
+                    <input type="number" id="paymentAmount" class="form-input" placeholder="500000">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Type</label>
+                    <select id="paymentType" class="form-select">
+                        <option value="investment">Investment</option>
+                        <option value="return">Return</option>
+                    </select>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label>Payment Type:</label>
-                <select id="paymentType">
-                    <option value="investment">Investment (Money In)</option>
-                    <option value="return">Return (Money Out)</option>
-                </select>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Date *</label>
+                    <input type="date" id="paymentDate" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <input type="text" id="paymentNotes" class="form-input" placeholder="First installment">
+                </div>
             </div>
 
-            <div class="form-group">
-                <label>Date:</label>
-                <input type="date" id="paymentDate">
-            </div>
-
-            <div class="form-group">
-                <label>Notes:</label>
-                <input type="text" id="paymentNotes" placeholder="e.g., First installment">
-            </div>
-
-            <button onclick="addPayment()">Add Payment</button>
+            <button onclick="savePayment()" class="btn btn-primary" style="width: 100%;">
+                Save Payment
+            </button>
         </div>
     </div>
 
-    <div id="timelineModal" class="modal">
+    <!-- Investor Modal -->
+    <div id="investorModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Transaction Timeline</h2>
-                <button class="close-btn" onclick="closeModal('timelineModal')">&times;</button>
+                <h2 class="modal-title" id="investorModalTitle">Add Investor</h2>
+                <button class="close-btn" onclick="closeModal('investorModal')">&times;</button>
             </div>
-            <div id="timelineContent"></div>
+            <input type="hidden" id="editInvestorId">
+            
+            <div class="form-group">
+                <label class="form-label">Full Name *</label>
+                <input type="text" id="investorName" class="form-input" placeholder="e.g., Rajesh Kumar">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Username * (for login)</label>
+                    <input type="text" id="investorUsername" class="form-input" placeholder="e.g., rajesh" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password *</label>
+                    <input type="text" id="investorPassword" class="form-input" placeholder="e.g., raj123" autocomplete="new-password">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email (optional)</label>
+                <input type="email" id="investorEmail" class="form-input" placeholder="e.g., rajesh@example.com">
+            </div>
+
+            <button onclick="saveInvestor()" class="btn btn-primary" style="width: 100%;">
+                Save Investor
+            </button>
         </div>
     </div>
 
-    <div id="emailModal" class="modal">
-        <div class="modal-content">
+    <!-- Change Password Modal -->
+    <div id="changePasswordModal" class="modal">
+        <div class="modal-content" style="max-width: 450px;">
             <div class="modal-header">
-                <h2>Email Notification Preview</h2>
-                <button class="close-btn" onclick="closeModal('emailModal')">&times;</button>
+                <h2 class="modal-title">Change Admin Password</h2>
+                <button class="close-btn" onclick="closeModal('changePasswordModal')">&times;</button>
             </div>
-            <div id="emailContent"></div>
-            <button onclick="copyEmail()" style="margin-top: 20px;">Copy Email Content</button>
+            
+            <div class="form-group">
+                <label class="form-label">Current Password *</label>
+                <input type="password" id="currentPassword" class="form-input" placeholder="Enter current password">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">New Password *</label>
+                <input type="password" id="newPassword" class="form-input" placeholder="Enter new password">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Confirm New Password *</label>
+                <input type="password" id="confirmPassword" class="form-input" placeholder="Confirm new password">
+            </div>
+
+            <button onclick="saveNewPassword()" class="btn btn-primary" style="width: 100%;">
+                Update Password
+            </button>
         </div>
     </div>
 
     <script>
-        // Configuration
         let apiUrl = localStorage.getItem('apiUrl') || '';
+        let setupCompleted = localStorage.getItem('setupCompleted') === 'true';
         let currentUser = null;
+        let currentView = 'plots';
         let plots = [];
-        let isSyncing = false;
 
-        const users = {
-            admin: { name: "Admin", role: "admin" },
-            investor1: { name: "Rajesh Kumar", role: "investor", email: "rajesh.kumar@example.com" },
-            investor2: { name: "Priya Sharma", role: "investor", email: "priya.sharma@example.com" },
-            investor3: { name: "Amit Patel", role: "investor", email: "amit.patel@example.com" }
-        };
+        const users = {};
+        let investors = [
+            { id: 'admin', name: 'Admin', username: 'admin', password: 'admin123', role: 'admin', email: '' },
+            { id: 'investor1', name: 'Rajesh Kumar', username: 'rajesh', password: 'raj123', role: 'investor', email: 'rajesh.kumar@example.com' },
+            { id: 'investor2', name: 'Priya Sharma', username: 'priya', password: 'priya123', role: 'investor', email: 'priya.sharma@example.com' },
+            { id: 'investor3', name: 'Amit Patel', username: 'amit', password: 'amit123', role: 'investor', email: 'amit.patel@example.com' }
+        ];
 
-        // Initialize
-        window.onload = function() {
-            if (!apiUrl) {
-                document.getElementById('setupScreen').style.display = 'block';
-            } else {
-                document.getElementById('loginScreen').style.display = 'block';
-                loadFromLocalStorage();
-            }
-        };
-
-        function saveApiUrl() {
-            const url = document.getElementById('apiUrl').value.trim();
-            if (!url) {
-                alert('Please enter your Google Apps Script Web App URL');
-                return;
-            }
-            apiUrl = url;
-            localStorage.setItem('apiUrl', url);
-            document.getElementById('setupScreen').style.display = 'none';
-            document.getElementById('loginScreen').style.display = 'block';
-            showSuccess('Setup complete! You can now login and sync data.');
+        // Build users object from investors array
+        function buildUsersObject() {
+            investors.forEach(inv => {
+                users[inv.id] = inv;
+            });
         }
 
-        function skipSetup() {
-            document.getElementById('setupScreen').style.display = 'none';
-            document.getElementById('loginScreen').style.display = 'block';
-            loadDemoData();
+        buildUsersObject();
+
+        window.onload = function() {
+            if (!setupCompleted) {
+                // Show setup in a modal instead
+                if (!apiUrl) {
+                    const setup = prompt('Enter your Google Apps Script Web App URL (or leave empty for demo mode):');
+                    if (setup) {
+                        apiUrl = setup;
+                        localStorage.setItem('apiUrl', setup);
+                    }
+                    localStorage.setItem('setupCompleted', 'true');
+                    setupCompleted = true;
+                }
+            }
+            loadFromLocalStorage();
+            loadInvestorsFromLocalStorage();
+        };
+
+        function resetSetup() {
+            if (confirm('Clear Google Sheets settings?')) {
+                localStorage.removeItem('setupCompleted');
+                localStorage.removeItem('apiUrl');
+                location.reload();
+            }
         }
 
         function loadDemoData() {
             plots = [
                 {
-                    id: 1,
-                    name: "Whitefield Premium Plot",
-                    plotNumber: "WF-A-123",
-                    surveyNumber: "45/2B",
-                    documentNumber: "",
-                    area: 2400,
-                    price: 5000000,
-                    description: "Near IT parks, 30x80 ft, corner plot",
-                    currentOwner: "Mr. Venkatesh Reddy",
-                    locationMap: "",
-                    photos: ["https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=400"],
-                    status: "available",
-                    advancePaid: 0,
-                    balancePaid: 0,
-                    buyingExpenses: 0,
-                    sellingPrice: 0,
-                    sellingExpenses: 0,
-                    payments: []
+                    id: 1, name: "Whitefield Premium", plotNumber: "WF-A-123",
+                    surveyNumber: "45/2B", area: 2400, price: 5000000,
+                    description: "Near IT parks, corner plot", currentOwner: "Mr. Venkatesh",
+                    status: "available", advancePaid: 0, payments: []
                 },
                 {
-                    id: 2,
-                    name: "Electronic City Layout",
-                    plotNumber: "EC-B-456",
-                    surveyNumber: "78/3A",
-                    documentNumber: "REG-2024-0156",
-                    area: 1800,
-                    description: "Gated community, ready for construction",
-                    currentOwner: "You (Purchased)",
-                    locationMap: "",
-                    photos: [],
-                    price: 3600000,
-                    status: "documentation",
-                    advancePaid: 500000,
-                    balancePaid: 0,
-                    buyingExpenses: 50000,
-                    sellingPrice: 0,
-                    sellingExpenses: 0,
+                    id: 2, name: "Electronic City Layout", plotNumber: "EC-B-456",
+                    area: 1800, price: 3600000, description: "Gated community",
+                    currentOwner: "You (Purchased)", status: "documentation", advancePaid: 500000,
                     payments: [
-                        { 
-                            id: 1,
-                            investor: "investor1", 
-                            amount: 1500000, 
-                            type: "investment",
-                            date: "2024-01-15",
-                            notes: "Investment payment"
-                        },
-                        {
-                            id: 2,
-                            investor: "investor2",
-                            amount: 1000000,
-                            type: "investment",
-                            date: "2024-01-15",
-                            notes: "Investment payment"
-                        }
+                        { id: 1, investor: "investor1", amount: 1500000, type: "investment", date: "2024-01-15", notes: "Investment" },
+                        { id: 2, investor: "investor2", amount: 1000000, type: "investment", date: "2024-01-15", notes: "Investment" }
                     ]
                 }
             ];
             saveToLocalStorage();
         }
 
-        // Google Sheets Sync Functions
-        async function syncData() {
+        function syncData() {
             if (!apiUrl) {
-                showError('Please complete setup first to enable Google Sheets sync');
+                showError('Google Sheets not configured. Using local storage only.');
                 return;
             }
 
-            if (isSyncing) return;
-            isSyncing = true;
-            
-            const syncBtn = document.getElementById('syncButton');
+            const syncBtn = document.getElementById('syncBtn');
             const syncStatus = document.getElementById('syncStatus');
             
             syncBtn.disabled = true;
             syncBtn.textContent = '⏳ Syncing...';
-            syncStatus.className = 'sync-status sync-loading';
-            syncStatus.textContent = '⏳ Syncing...';
+            syncStatus.className = 'message message-success';
+            syncStatus.textContent = 'Syncing...';
             syncStatus.style.display = 'block';
 
-            try {
-                await saveToGoogleSheets();
-                syncStatus.className = 'sync-status sync-success';
-                syncStatus.textContent = '✓ Synced with Google Sheets';
-                showSuccess('Data synced successfully with Google Sheets!');
-            } catch (error) {
-                syncStatus.className = 'sync-status sync-error';
-                syncStatus.textContent = '✗ Sync failed';
-                showError('Sync failed: ' + error.message);
-            } finally {
-                syncBtn.disabled = false;
-                syncBtn.textContent = '🔄 Sync with Google Sheets';
-                isSyncing = false;
-                
-                setTimeout(() => {
-                    if (syncStatus.textContent !== '✗ Sync failed') {
-                        syncStatus.style.display = 'none';
-                    }
-                }, 3000);
-            }
-        }
-
-        async function saveToGoogleSheets() {
-            // Convert plots to 2D array for Google Sheets
-            const plotsData = [
-                ['ID', 'Name', 'Plot Number', 'Survey Number', 'Document Number', 'Area', 'Price', 
-                 'Description', 'Current Owner', 'Location Map', 'Photos', 'Status', 
-                 'Advance Paid', 'Balance Paid', 'Buying Expenses', 'Selling Price', 'Selling Expenses']
-            ];
-
-            plots.forEach(plot => {
-                plotsData.push([
-                    plot.id,
-                    plot.name,
-                    plot.plotNumber,
-                    plot.surveyNumber || '',
-                    plot.documentNumber || '',
-                    plot.area,
-                    plot.price,
-                    plot.description || '',
-                    plot.currentOwner || '',
-                    plot.locationMap || '',
-                    (plot.photos || []).join('|'),
-                    plot.status,
-                    plot.advancePaid || 0,
-                    plot.balancePaid || 0,
-                    plot.buyingExpenses || 0,
-                    plot.sellingPrice || 0,
-                    plot.sellingExpenses || 0
-                ]);
-            });
-
-            // Convert payments to 2D array
-            const paymentsData = [
-                ['Payment ID', 'Plot ID', 'Investor', 'Amount', 'Type', 'Date', 'Notes']
-            ];
-
-            plots.forEach(plot => {
-                (plot.payments || []).forEach(payment => {
-                    paymentsData.push([
-                        payment.id,
-                        plot.id,
-                        payment.investor,
-                        payment.amount,
-                        payment.type,
-                        payment.date,
-                        payment.notes || ''
-                    ]);
+            saveToGoogleSheets()
+                .then(() => {
+                    syncStatus.textContent = '✓ Synced!';
+                    showSuccess('Synced with Google Sheets!');
+                })
+                .catch(error => {
+                    syncStatus.className = 'message message-error';
+                    syncStatus.textContent = '✗ Failed';
+                    showError('Sync failed: ' + error.message);
+                })
+                .finally(() => {
+                    syncBtn.disabled = false;
+                    syncBtn.textContent = '🔄 Sync';
+                    setTimeout(() => syncStatus.style.display = 'none', 3000);
                 });
-            });
-
-            // Save plots
-            const plotsResponse = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'savePlots',
-                    plots: plotsData
-                })
-            });
-
-            if (!plotsResponse.ok) throw new Error('Failed to save plots');
-
-            // Save payments
-            const paymentsResponse = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'savePayments',
-                    payments: paymentsData
-                })
-            });
-
-            if (!paymentsResponse.ok) throw new Error('Failed to save payments');
-            
-            saveToLocalStorage();
         }
 
-        async function loadFromGoogleSheets() {
-            if (!apiUrl) return false;
+        function saveToGoogleSheets() {
+            return new Promise((resolve, reject) => {
+                const plotsData = [['ID', 'Name', 'Plot Number', 'Survey Number', 'Area', 'Price', 'Description', 'Current Owner', 'Status', 'Advance Paid']];
+                plots.forEach(plot => {
+                    plotsData.push([plot.id, plot.name, plot.plotNumber, plot.surveyNumber || '', plot.area, plot.price, 
+                        plot.description || '', plot.currentOwner || '', plot.status, plot.advancePaid || 0]);
+                });
 
-            try {
-                const plotsResponse = await fetch(`${apiUrl}?action=getPlots`);
-                const plotsResult = await plotsResponse.json();
-                
-                const paymentsResponse = await fetch(`${apiUrl}?action=getPayments`);
-                const paymentsResult = await paymentsResponse.json();
+                const paymentsData = [['Payment ID', 'Plot ID', 'Investor', 'Amount', 'Type', 'Date', 'Notes']];
+                plots.forEach(plot => {
+                    (plot.payments || []).forEach(payment => {
+                        paymentsData.push([payment.id, plot.id, payment.investor, payment.amount, payment.type, payment.date, payment.notes || '']);
+                    });
+                });
 
-                if (plotsResult.plots && plotsResult.plots.length > 1) {
-                    // Parse plots (skip header row)
-                    plots = plotsResult.plots.slice(1).map(row => ({
-                        id: row[0],
-                        name: row[1],
-                        plotNumber: row[2],
-                        surveyNumber: row[3],
-                        documentNumber: row[4],
-                        area: row[5],
-                        price: row[6],
-                        description: row[7],
-                        currentOwner: row[8],
-                        locationMap: row[9],
-                        photos: row[10] ? row[10].split('|') : [],
-                        status: row[11],
-                        advancePaid: row[12] || 0,
-                        balancePaid: row[13] || 0,
-                        buyingExpenses: row[14] || 0,
-                        sellingPrice: row[15] || 0,
-                        sellingExpenses: row[16] || 0,
-                        payments: []
-                    }));
+                const investorsData = [['ID', 'Name', 'Username', 'Password', 'Role', 'Email']];
+                investors.forEach(inv => {
+                    investorsData.push([inv.id, inv.name, inv.username, inv.password, inv.role, inv.email || '']);
+                });
 
-                    // Parse payments (skip header row)
-                    if (paymentsResult.payments && paymentsResult.payments.length > 1) {
-                        paymentsResult.payments.slice(1).forEach(row => {
-                            const plotId = row[1];
-                            const plot = plots.find(p => p.id === plotId);
-                            if (plot) {
-                                plot.payments.push({
-                                    id: row[0],
-                                    investor: row[2],
-                                    amount: row[3],
-                                    type: row[4],
-                                    date: row[5],
-                                    notes: row[6]
-                                });
-                            }
-                        });
+                const dataToSend = { plots: plotsData, payments: paymentsData, investors: investorsData };
+                const jsonString = JSON.stringify(dataToSend);
+                const encoded = btoa(unescape(encodeURIComponent(jsonString)));
+
+                window.saveCallback = function(response) {
+                    if (response.success) {
+                        saveToLocalStorage();
+                        saveInvestorsToLocalStorage();
+                        resolve();
+                    } else {
+                        reject(new Error(response.error || 'Unknown error'));
                     }
+                    delete window.saveCallback;
+                };
 
-                    saveToLocalStorage();
-                    return true;
-                }
-            } catch (error) {
-                console.error('Failed to load from Google Sheets:', error);
-            }
-            
-            return false;
+                const script = document.createElement('script');
+                script.src = `${apiUrl}?action=saveData&data=${encodeURIComponent(encoded)}&callback=saveCallback`;
+                script.onerror = () => { delete window.saveCallback; reject(new Error('Network error')); };
+                document.body.appendChild(script);
+                setTimeout(() => { if (script.parentNode) script.parentNode.removeChild(script); }, 10000);
+            });
         }
 
-        // Local Storage Functions
+        function loadFromGoogleSheets() {
+            if (!apiUrl) return Promise.resolve(false);
+            return new Promise((resolve) => {
+                window.loadCallback = function(data) {
+                    if (data.success && data.plots && data.plots.length > 1) {
+                        plots = data.plots.slice(1).map(row => ({
+                            id: row[0], name: row[1], plotNumber: row[2], surveyNumber: row[3],
+                            area: row[4], price: row[5], description: row[6], currentOwner: row[7],
+                            status: row[8], advancePaid: row[9] || 0, payments: []
+                        }));
+                        if (data.payments && data.payments.length > 1) {
+                            data.payments.slice(1).forEach(row => {
+                                const plot = plots.find(p => p.id === row[1]);
+                                if (plot) {
+                                    plot.payments.push({ id: row[0], investor: row[2], amount: row[3], type: row[4], date: row[5], notes: row[6] });
+                                }
+                            });
+                        }
+                        if (data.investors && data.investors.length > 1) {
+                            investors = data.investors.slice(1).map(row => ({
+                                id: row[0], name: row[1], username: row[2], password: row[3], role: row[4], email: row[5] || ''
+                            }));
+                            buildUsersObject();
+                        }
+                        saveToLocalStorage();
+                        saveInvestorsToLocalStorage();
+                        resolve(true);
+                    } else { resolve(false); }
+                    delete window.loadCallback;
+                };
+                const script = document.createElement('script');
+                script.src = `${apiUrl}?action=getData&callback=loadCallback`;
+                script.onerror = () => { delete window.loadCallback; resolve(false); };
+                document.body.appendChild(script);
+            });
+        }
+
         function saveToLocalStorage() {
             localStorage.setItem('plotsData', JSON.stringify(plots));
         }
@@ -1191,24 +926,33 @@ function doPost(e) {
             }
         }
 
-        // [Previous app functions continue here - login, logout, renderStats, etc.]
-        // Due to length, I'm including key functions:
-
         function login() {
-            const userId = document.getElementById('userSelect').value;
-            if (!userId) {
-                alert('Please select a user');
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const errorEl = document.getElementById('loginError');
+            
+            if (!username || !password) {
+                errorEl.textContent = 'Please enter username and password';
+                errorEl.style.display = 'block';
                 return;
             }
-            currentUser = { id: userId, ...users[userId] };
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'block';
             
-            // Try to load from Google Sheets first
+            // Find user by username and password
+            const user = investors.find(inv => inv.username === username && inv.password === password);
+            
+            if (!user) {
+                errorEl.textContent = 'Invalid username or password';
+                errorEl.style.display = 'block';
+                return;
+            }
+            
+            currentUser = { id: user.id, ...user };
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('sidebar').classList.add('active');
+            document.getElementById('mainContent').classList.add('shifted');
+            
             if (apiUrl) {
-                loadFromGoogleSheets().then(() => {
-                    loadDashboard();
-                });
+                loadFromGoogleSheets().then(() => loadDashboard());
             } else {
                 loadDashboard();
             }
@@ -1216,18 +960,69 @@ function doPost(e) {
 
         function logout() {
             currentUser = null;
-            document.getElementById('loginScreen').style.display = 'block';
-            document.getElementById('dashboard').style.display = 'none';
-            document.getElementById('userSelect').value = '';
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('sidebar').classList.remove('active');
+            document.getElementById('mainContent').classList.remove('shifted');
         }
 
         function loadDashboard() {
-            document.getElementById('dashboardTitle').textContent = 
-                currentUser.role === 'admin' ? 'Admin Dashboard' : 'My Investment Portfolio';
-            document.getElementById('userName').textContent = currentUser.name;
-
+            renderSidebar();
             renderStats();
-            renderTabs();
+            switchView('plots');
+            
+            // Show change password button for admin
+            if (currentUser.role === 'admin') {
+                document.getElementById('changePasswordBtn').style.display = 'flex';
+            }
+        }
+
+        function renderSidebar() {
+            const nav = document.getElementById('sidebarNav');
+            if (currentUser.role === 'admin') {
+                nav.innerHTML = `
+                    <button class="nav-item active" onclick="switchView('plots')">
+                        <span class="nav-icon">📊</span> Plots
+                    </button>
+                    <button class="nav-item" onclick="switchView('payments')">
+                        <span class="nav-icon">💰</span> Payments
+                    </button>
+                    <button class="nav-item" onclick="switchView('investors')">
+                        <span class="nav-icon">👥</span> Investors
+                    </button>
+                `;
+            } else {
+                nav.innerHTML = `
+                    <button class="nav-item active" onclick="switchView('my-plots')">
+                        <span class="nav-icon">📊</span> My Investments
+                    </button>
+                    <button class="nav-item" onclick="switchView('opportunities')">
+                        <span class="nav-icon">🔍</span> Opportunities
+                    </button>
+                `;
+            }
+        }
+
+        function switchView(view) {
+            currentView = view;
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const titles = {
+                'plots': 'All Plots',
+                'payments': 'All Payments',
+                'investors': 'Investor Management',
+                'my-plots': 'My Investments',
+                'opportunities': 'Investment Opportunities'
+            };
+            
+            document.getElementById('pageTitle').textContent = titles[view];
+            document.getElementById('pageSubtitle').textContent = currentUser.name;
+            
+            if (view === 'plots') renderPlotsView();
+            else if (view === 'payments') renderPaymentsView();
+            else if (view === 'investors') renderInvestorsView();
+            else if (view === 'my-plots') renderMyPlotsView();
+            else if (view === 'opportunities') renderOpportunitiesView();
         }
 
         function renderStats() {
@@ -1235,254 +1030,266 @@ function doPost(e) {
             let stats = [];
 
             if (currentUser.role === 'admin') {
-                const totalPlots = plots.length;
-                const activePlots = plots.filter(p => p.status !== 'sold').length;
-                const totalInvested = plots.reduce((sum, p) => {
-                    return sum + (p.payments || []).filter(pay => pay.type === 'investment').reduce((s, i) => s + i.amount, 0);
-                }, 0);
-                const totalReturned = plots.reduce((sum, p) => {
-                    return sum + (p.payments || []).filter(pay => pay.type === 'return').reduce((s, i) => s + i.amount, 0);
-                }, 0);
-
+                const totalInvested = plots.reduce((sum, p) => 
+                    sum + (p.payments || []).filter(pay => pay.type === 'investment').reduce((s, i) => s + i.amount, 0), 0);
+                const totalReturns = plots.reduce((sum, p) => 
+                    sum + (p.payments || []).filter(pay => pay.type === 'return').reduce((s, i) => s + i.amount, 0), 0);
                 stats = [
-                    { label: 'Total Plots', value: totalPlots },
-                    { label: 'Active Plots', value: activePlots },
+                    { label: 'Total Plots', value: plots.length },
+                    { label: 'Active Plots', value: plots.filter(p => p.status !== 'sold').length },
                     { label: 'Total Investment', value: formatCurrency(totalInvested) },
-                    { label: 'Total Returns', value: formatCurrency(totalReturned) }
+                    { label: 'Total Returns', value: formatCurrency(totalReturns) }
                 ];
             } else {
-                const myPlots = plots.filter(p => 
-                    (p.payments || []).some(pay => pay.investor === currentUser.id)
-                );
-                const totalInvested = plots.reduce((sum, p) => {
-                    return sum + (p.payments || [])
+                const myPlots = plots.filter(p => (p.payments || []).some(pay => pay.investor === currentUser.id));
+                const totalInvested = plots.reduce((sum, p) => 
+                    sum + (p.payments || [])
                         .filter(pay => pay.investor === currentUser.id && pay.type === 'investment')
-                        .reduce((s, pay) => s + pay.amount, 0);
-                }, 0);
-                const totalReturned = plots.reduce((sum, p) => {
-                    return sum + (p.payments || [])
+                        .reduce((s, pay) => s + pay.amount, 0), 0);
+                const totalReturns = plots.reduce((sum, p) => 
+                    sum + (p.payments || [])
                         .filter(pay => pay.investor === currentUser.id && pay.type === 'return')
-                        .reduce((s, pay) => s + pay.amount, 0);
-                }, 0);
-                const activeInvestments = myPlots.filter(p => p.status !== 'sold').length;
-
+                        .reduce((s, pay) => s + pay.amount, 0), 0);
+                const profitLoss = totalReturns - totalInvested;
+                const activePlots = myPlots.filter(p => p.status !== 'sold').length;
+                
                 stats = [
                     { label: 'Total Invested', value: formatCurrency(totalInvested) },
-                    { label: 'Total Returns', value: formatCurrency(totalReturned) },
-                    { label: 'Active Investments', value: activeInvestments },
-                    { label: 'Profit/Loss', value: formatCurrency(totalReturned - totalInvested) }
+                    { label: 'Total Returns', value: formatCurrency(totalReturns) },
+                    { label: 'Profit/Loss', value: formatCurrency(profitLoss), color: profitLoss >= 0 ? '#10b981' : '#ef4444' },
+                    { label: 'Active Plots', value: activePlots }
                 ];
             }
 
             statsGrid.innerHTML = stats.map(s => `
                 <div class="stat-card">
-                    <h3>${s.label}</h3>
-                    <div class="value">${s.value}</div>
+                    <div class="stat-label">${s.label}</div>
+                    <div class="stat-value" style="${s.color ? 'color: ' + s.color : ''}">${s.value}</div>
                 </div>
             `).join('');
         }
 
-        function renderTabs() {
-            const tabsContainer = document.getElementById('tabsContainer');
-            const tabContents = document.getElementById('tabContents');
-
-            if (currentUser.role === 'admin') {
-                tabsContainer.innerHTML = `
-                    <button class="tab active" onclick="switchTab('all')">All Plots</button>
-                    <button class="tab" onclick="switchTab('available')">Available</button>
-                    <button class="tab" onclick="switchTab('active')">Active</button>
-                    <button class="tab" onclick="switchTab('sold')">Sold</button>
-                `;
-
-                tabContents.innerHTML = `
-                    <div id="tab-all" class="tab-content active">
-                        <button onclick="openModal('addPlotModal')" style="margin-bottom: 20px;">+ Add New Plot</button>
-                        <div id="allPlots" class="plot-grid"></div>
+        function renderPlotsView() {
+            const content = document.getElementById('mainContentArea');
+            content.innerHTML = `
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">All Plots</h3>
+                        <button class="btn btn-primary" onclick="openAddPlot()">+ Add Plot</button>
                     </div>
-                    <div id="tab-available" class="tab-content">
-                        <div id="availablePlots" class="plot-grid"></div>
-                    </div>
-                    <div id="tab-active" class="tab-content">
-                        <div id="activePlots" class="plot-grid"></div>
-                    </div>
-                    <div id="tab-sold" class="tab-content">
-                        <div id="soldPlots" class="plot-grid"></div>
-                    </div>
-                `;
-
-                renderAdminPlots();
-            } else {
-                tabsContainer.innerHTML = `
-                    <button class="tab active" onclick="switchTab('my-investments')">My Investments</button>
-                    <button class="tab" onclick="switchTab('opportunities')">Opportunities</button>
-                    <button class="tab" onclick="switchTab('my-timeline')">My Timeline</button>
-                `;
-
-                tabContents.innerHTML = `
-                    <div id="tab-my-investments" class="tab-content active">
-                        <div id="myInvestments" class="plot-grid"></div>
-                    </div>
-                    <div id="tab-opportunities" class="tab-content">
-                        <div id="opportunities" class="plot-grid"></div>
-                    </div>
-                    <div id="tab-my-timeline" class="tab-content">
-                        <div id="myTimeline"></div>
-                    </div>
-                `;
-
-                renderInvestorPlots();
-            }
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Plot #</th>
+                                <th>Name</th>
+                                <th>Area</th>
+                                <th>Price</th>
+                                <th>Owner</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="plotsTableBody"></tbody>
+                    </table>
+                </div>
+            `;
+            renderPlotsTable();
         }
 
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        function renderPlotsTable() {
+            const tbody = document.getElementById('plotsTableBody');
+            if (!tbody) return;
             
-            event.target.classList.add('active');
-            document.getElementById(`tab-${tabName}`).classList.add('active');
-
-            if (tabName === 'my-timeline' && currentUser.role === 'investor') {
-                renderInvestorTimeline();
-            }
+            tbody.innerHTML = plots.map(plot => {
+                const statusClass = `status-${plot.status}`;
+                const statusText = { available: 'Available', documentation: 'Documentation', owned: 'Owned', marketing: 'Marketing', sold: 'Sold' }[plot.status];
+                return `
+                    <tr>
+                        <td><strong>${plot.plotNumber}</strong></td>
+                        <td>${plot.name}</td>
+                        <td>${plot.area.toLocaleString()} sq ft</td>
+                        <td>${formatCurrency(plot.price)}</td>
+                        <td>${plot.currentOwner}</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td style="white-space: nowrap;">
+                            <button onclick="editPlot(${plot.id})" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; margin-right: 4px;">Edit</button>
+                            <button onclick="openAddPaymentForPlot(${plot.id})" class="btn btn-primary" style="padding: 6px 12px; font-size: 12px; margin-right: 4px;">+ Payment</button>
+                            <button onclick="deletePlot(${plot.id})" class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('') || '<tr><td colspan="7" class="empty-state"><div class="empty-state-icon">📊</div>No plots yet. Add your first plot!</td></tr>';
         }
 
-        // Simplified render functions (keeping core logic)
-        function renderAdminPlots() {
-            document.getElementById('allPlots').innerHTML = plots.map(p => renderPlotCard(p, true)).join('') || '<div class="plot-card">No plots yet. Click "Add New Plot" to get started!</div>';
-            document.getElementById('availablePlots').innerHTML = 
-                plots.filter(p => p.status === 'available').map(p => renderPlotCard(p, true)).join('') || '<div class="plot-card">No available plots</div>';
-            document.getElementById('activePlots').innerHTML = 
-                plots.filter(p => p.status !== 'available' && p.status !== 'sold').map(p => renderPlotCard(p, true)).join('') || '<div class="plot-card">No active plots</div>';
-            document.getElementById('soldPlots').innerHTML = 
-                plots.filter(p => p.status === 'sold').map(p => renderPlotCard(p, true)).join('') || '<div class="plot-card">No sold plots</div>';
-        }
-
-        function renderInvestorPlots() {
-            const myPlots = plots.filter(p => (p.payments || []).some(pay => pay.investor === currentUser.id));
-            const opportunities = plots.filter(p => p.status === 'available');
-
-            document.getElementById('myInvestments').innerHTML = 
-                myPlots.length ? myPlots.map(p => renderPlotCard(p, false)).join('') : 
-                '<div class="plot-card">No investments yet. Check opportunities tab!</div>';
-
-            document.getElementById('opportunities').innerHTML = 
-                opportunities.length ? opportunities.map(p => renderPlotCard(p, false)).join('') : 
-                '<div class="plot-card">No opportunities available</div>';
-        }
-
-        function renderInvestorTimeline() {
-            const myPayments = [];
+        function renderPaymentsView() {
+            const content = document.getElementById('mainContentArea');
+            let allPayments = [];
             plots.forEach(plot => {
                 (plot.payments || []).forEach(payment => {
-                    if (payment.investor === currentUser.id) {
-                        myPayments.push({
-                            ...payment,
-                            plotName: plot.name,
-                            plotNumber: plot.plotNumber
-                        });
-                    }
+                    allPayments.push({ ...payment, plotName: plot.name, plotNumber: plot.plotNumber, plotId: plot.id });
                 });
             });
+            allPayments.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-            myPayments.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-            const timelineHTML = `
-                <div class="timeline">
-                    <h3 style="margin-bottom: 20px;">All Your Transactions</h3>
-                    ${myPayments.map(payment => `
-                        <div class="timeline-item">
-                            <div class="timeline-date">${formatDate(payment.date)}</div>
-                            <div class="timeline-content">
-                                <div class="timeline-title">
-                                    ${payment.type === 'investment' ? '💰 Investment' : '✅ Return Received'}
-                                </div>
-                                <div class="timeline-desc">
-                                    ${payment.plotName} (${payment.plotNumber})<br>
-                                    ${payment.notes}
-                                </div>
-                                <div class="timeline-amount">
-                                    ${payment.type === 'investment' ? '-' : '+'} ${formatCurrency(payment.amount)}
-                                </div>
-                            </div>
-                        </div>
-                    `).join('')}
-                    ${myPayments.length === 0 ? '<p style="text-align: center; color: #666;">No transactions yet</p>' : ''}
+            content.innerHTML = `
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">All Payments</h3>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Plot</th>
+                                <th>Investor</th>
+                                <th>Amount</th>
+                                <th>Type</th>
+                                <th>Notes</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${allPayments.map(payment => `
+                                <tr>
+                                    <td>${formatDate(payment.date)}</td>
+                                    <td>${payment.plotNumber}</td>
+                                    <td>${users[payment.investor].name}</td>
+                                    <td><strong>${formatCurrency(payment.amount)}</strong></td>
+                                    <td><span class="status-badge ${payment.type === 'investment' ? 'status-owned' : 'status-sold'}">
+                                        ${payment.type === 'investment' ? 'Investment' : 'Return'}
+                                    </span></td>
+                                    <td>${payment.notes}</td>
+                                    <td>
+                                        <button onclick="editPayment(${payment.plotId}, ${payment.id})" class="btn btn-secondary" style="margin-right: 4px;">Edit</button>
+                                        <button onclick="deletePayment(${payment.plotId}, ${payment.id})" class="btn btn-danger">Delete</button>
+                                    </td>
+                                </tr>
+                            `).join('') || '<tr><td colspan="7" class="empty-state"><div class="empty-state-icon">💰</div>No payments recorded yet.</td></tr>'}
+                        </tbody>
+                    </table>
                 </div>
             `;
-
-            document.getElementById('myTimeline').innerHTML = timelineHTML;
         }
 
-        function renderPlotCard(plot, isAdmin) {
-            const statusClass = `status-${plot.status}`;
-            const statusText = {
-                available: '🔍 Available',
-                documentation: '📝 Documentation',
-                owned: '✅ Owned',
-                marketing: '💰 Marketing',
-                sold: '🎉 Sold'
-            }[plot.status];
-
-            const payments = plot.payments || [];
-            const totalInvestment = payments.filter(p => p.type === 'investment').reduce((sum, p) => sum + p.amount, 0);
-            const myPayments = payments.filter(p => p.investor === currentUser.id);
-            const myTotalInvestment = myPayments.filter(p => p.type === 'investment').reduce((sum, p) => sum + p.amount, 0);
-            const myStake = totalInvestment > 0 ? ((myTotalInvestment / totalInvestment) * 100).toFixed(1) : 0;
-
-            let detailsHTML = `
-                <div class="plot-details">
-                    <div class="detail-item">
-                        <div class="detail-label">Plot Number</div>
-                        <div class="detail-value">${plot.plotNumber}</div>
+        function renderMyPlotsView() {
+            const myPlots = plots.filter(p => (p.payments || []).some(pay => pay.investor === currentUser.id));
+            const content = document.getElementById('mainContentArea');
+            content.innerHTML = `
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">My Investments</h3>
                     </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Area</div>
-                        <div class="detail-value">${plot.area} sq ft</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Price</div>
-                        <div class="detail-value">${formatCurrency(plot.price)}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Owner</div>
-                        <div class="detail-value" style="font-size: 13px;">${plot.currentOwner}</div>
-                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Plot</th>
+                                <th>Status</th>
+                                <th>My Investment</th>
+                                <th>Returns Received</th>
+                                <th>Profit/Loss</th>
+                                <th>My Stake %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${myPlots.length ? myPlots.map(p => {
+                                const myInvestments = p.payments.filter(pay => pay.investor === currentUser.id && pay.type === 'investment').reduce((sum, pay) => sum + pay.amount, 0);
+                                const myReturns = p.payments.filter(pay => pay.investor === currentUser.id && pay.type === 'return').reduce((sum, pay) => sum + pay.amount, 0);
+                                const myProfitLoss = myReturns - myInvestments;
+                                const totalInvestment = p.payments.filter(pay => pay.type === 'investment').reduce((sum, pay) => sum + pay.amount, 0);
+                                const myStake = totalInvestment > 0 ? ((myInvestments / totalInvestment) * 100).toFixed(1) : 0;
+                                const profitLossColor = myProfitLoss > 0 ? '#10b981' : myProfitLoss < 0 ? '#ef4444' : '#6b7280';
+                                
+                                return `
+                                    <tr>
+                                        <td>
+                                            <strong>${p.plotNumber}</strong><br>
+                                            <span style="color: var(--text-light); font-size: 13px;">${p.name}</span>
+                                        </td>
+                                        <td><span class="status-badge status-${p.status}">${p.status}</span></td>
+                                        <td><strong>${formatCurrency(myInvestments)}</strong></td>
+                                        <td><strong style="color: #10b981;">${formatCurrency(myReturns)}</strong></td>
+                                        <td><strong style="color: ${profitLossColor};">${myProfitLoss >= 0 ? '+' : ''}${formatCurrency(myProfitLoss)}</strong></td>
+                                        <td><span class="status-badge status-owned">${myStake}%</span></td>
+                                    </tr>
+                                `;
+                            }).join('') : '<tr><td colspan="6" class="empty-state"><div class="empty-state-icon">📊</div>No investments yet. Check opportunities!</td></tr>'}
+                        </tbody>
+                    </table>
                 </div>
             `;
+        }
 
-            if (plot.description) {
-                detailsHTML += `<p style="margin: 15px 0; color: #666;">${plot.description}</p>`;
-            }
-
-            if (!isAdmin && myTotalInvestment > 0) {
-                detailsHTML += `
-                    <div style="margin-top: 15px; padding: 15px; background: #f0f7ff; border-radius: 8px;">
-                        <strong>My Investment: ${formatCurrency(myTotalInvestment)} (${myStake}% stake)</strong>
+        function renderOpportunitiesView() {
+            const opportunities = plots.filter(p => p.status === 'available');
+            const content = document.getElementById('mainContentArea');
+            content.innerHTML = `
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Investment Opportunities</h3>
                     </div>
-                `;
-            }
+                    <table>
+                        <thead>
+                            <tr><th>Plot</th><th>Area</th><th>Price</th><th>Description</th></tr>
+                        </thead>
+                        <tbody>
+                            ${opportunities.length ? opportunities.map(p => `
+                                <tr>
+                                    <td><strong>${p.plotNumber}</strong><br><span style="color: var(--text-light); font-size: 13px;">${p.name}</span></td>
+                                    <td>${p.area} sq ft</td>
+                                    <td><strong>${formatCurrency(p.price)}</strong></td>
+                                    <td>${p.description || '-'}</td>
+                                </tr>
+                            `).join('') : '<tr><td colspan="4" class="empty-state"><div class="empty-state-icon">🔍</div>No opportunities available.</td></tr>'}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
 
-            let actionsHTML = '';
-            if (isAdmin) {
-                actionsHTML = `
-                    <div class="btn-group" style="margin-top: 15px;">
-                        <button onclick="openUpdatePlot(${plot.id})">Update Status</button>
-                        <button onclick="openAddPayment(${plot.id})" class="btn-secondary">Add Payment</button>
+        function renderInvestorsView() {
+            const content = document.getElementById('mainContentArea');
+            const investorsList = investors.filter(inv => inv.role === 'investor');
+            
+            content.innerHTML = `
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Investor Management</h3>
+                        <button class="btn btn-primary" onclick="openAddInvestor()">+ Add Investor</button>
                     </div>
-                `;
-            }
-
-            return `
-                <div class="plot-card">
-                    <div class="plot-header">
-                        <div>
-                            <div class="plot-title">${plot.name}</div>
-                            <div class="plot-subtitle">${plot.plotNumber}</div>
-                        </div>
-                        <div class="status-badge ${statusClass}">${statusText}</div>
-                    </div>
-                    ${detailsHTML}
-                    ${actionsHTML}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Password</th>
+                                <th>Total Invested</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${investorsList.map(inv => {
+                                const totalInvested = plots.reduce((sum, p) => 
+                                    sum + (p.payments || [])
+                                        .filter(pay => pay.investor === inv.id && pay.type === 'investment')
+                                        .reduce((s, pay) => s + pay.amount, 0), 0);
+                                
+                                return `
+                                    <tr>
+                                        <td><strong>${inv.name}</strong></td>
+                                        <td>${inv.username}</td>
+                                        <td>${inv.email || '-'}</td>
+                                        <td><code style="background: #f3f4f6; padding: 4px 8px; border-radius: 4px;">${inv.password}</code></td>
+                                        <td><strong>${formatCurrency(totalInvested)}</strong></td>
+                                        <td style="white-space: nowrap;">
+                                            <button onclick="editInvestor('${inv.id}')" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; margin-right: 4px;">Edit</button>
+                                            <button onclick="deleteInvestor('${inv.id}')" class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;">Delete</button>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('') || '<tr><td colspan="6" class="empty-state"><div class="empty-state-icon">👥</div>No investors yet.</td></tr>'}
+                        </tbody>
+                    </table>
                 </div>
             `;
         }
@@ -1498,16 +1305,39 @@ function doPost(e) {
 
         function openModal(modalId) {
             document.getElementById(modalId).style.display = 'block';
-            if (modalId === 'addPaymentModal') {
-                document.getElementById('paymentDate').valueAsDate = new Date();
-            }
         }
 
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
         }
 
-        function addPlot() {
+        function openAddPlot() {
+            document.getElementById('plotModalTitle').textContent = 'Add New Plot';
+            document.getElementById('editPlotId').value = '';
+            ['plotName', 'plotNumber', 'surveyNumber', 'plotArea', 'plotPrice', 'currentOwner', 'plotDescription', 'advancePaid'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+            document.getElementById('plotStatus').value = 'available';
+            openModal('plotModal');
+        }
+
+        function editPlot(plotId) {
+            const plot = plots.find(p => p.id === plotId);
+            document.getElementById('plotModalTitle').textContent = 'Edit Plot';
+            document.getElementById('editPlotId').value = plotId;
+            document.getElementById('plotName').value = plot.name;
+            document.getElementById('plotNumber').value = plot.plotNumber;
+            document.getElementById('surveyNumber').value = plot.surveyNumber || '';
+            document.getElementById('plotArea').value = plot.area;
+            document.getElementById('plotPrice').value = plot.price;
+            document.getElementById('currentOwner').value = plot.currentOwner || '';
+            document.getElementById('plotStatus').value = plot.status;
+            document.getElementById('advancePaid').value = plot.advancePaid || '';
+            document.getElementById('plotDescription').value = plot.description || '';
+            openModal('plotModal');
+        }
+
+        function savePlot() {
             const name = document.getElementById('plotName').value;
             const plotNumber = document.getElementById('plotNumber').value;
             const area = parseInt(document.getElementById('plotArea').value);
@@ -1518,170 +1348,299 @@ function doPost(e) {
                 return;
             }
 
-            const newPlot = {
-                id: plots.length + 1,
-                name,
-                plotNumber,
-                surveyNumber: document.getElementById('surveyNumber').value,
-                documentNumber: document.getElementById('documentNumber').value,
-                area,
-                price,
-                description: document.getElementById('plotDescription').value,
-                currentOwner: document.getElementById('currentOwner').value || 'Available',
-                locationMap: document.getElementById('locationMap').value,
-                photos: document.getElementById('plotPhotos').value.split(',').map(p => p.trim()).filter(p => p),
-                status: 'available',
-                advancePaid: 0,
-                balancePaid: 0,
-                buyingExpenses: 0,
-                sellingPrice: 0,
-                sellingExpenses: 0,
-                payments: []
-            };
-
-            plots.push(newPlot);
-            saveToLocalStorage();
-            closeModal('addPlotModal');
-            showSuccess('Plot added! Remember to sync with Google Sheets.');
-            loadDashboard();
-
-            // Clear form
-            ['plotName', 'plotNumber', 'surveyNumber', 'documentNumber', 'plotArea', 
-             'plotPrice', 'plotDescription', 'currentOwner', 'locationMap', 'plotPhotos'].forEach(id => {
-                document.getElementById(id).value = '';
-            });
-        }
-
-        function openUpdatePlot(plotId) {
-            const plot = plots.find(p => p.id === plotId);
-            document.getElementById('updatePlotId').value = plotId;
-            document.getElementById('updateStatus').value = plot.status;
-            document.getElementById('advancePaid').value = plot.advancePaid || '';
-            document.getElementById('balancePaid').value = plot.balancePaid || '';
-            document.getElementById('buyingExpenses').value = plot.buyingExpenses || '';
-            document.getElementById('sellingPrice').value = plot.sellingPrice || '';
-            document.getElementById('sellingExpenses').value = plot.sellingExpenses || '';
-            handleStatusChange();
-            openModal('updatePlotModal');
-        }
-
-        function handleStatusChange() {
-            const status = document.getElementById('updateStatus').value;
-            document.getElementById('ownershipFields').style.display = 
-                (status === 'owned' || status === 'sold') ? 'block' : 'none';
-            document.getElementById('sellingFields').style.display = 
-                (status === 'sold') ? 'block' : 'none';
-        }
-
-        function updatePlot() {
-            const plotId = parseInt(document.getElementById('updatePlotId').value);
-            const plot = plots.find(p => p.id === plotId);
-
-            plot.status = document.getElementById('updateStatus').value;
-            plot.advancePaid = parseInt(document.getElementById('advancePaid').value) || 0;
-            plot.balancePaid = parseInt(document.getElementById('balancePaid').value) || 0;
-            plot.buyingExpenses = parseInt(document.getElementById('buyingExpenses').value) || 0;
-            plot.sellingPrice = parseInt(document.getElementById('sellingPrice').value) || 0;
-            plot.sellingExpenses = parseInt(document.getElementById('sellingExpenses').value) || 0;
-
-            const newOwner = document.getElementById('newOwner').value;
-            if (newOwner && (plot.status === 'owned' || plot.status === 'sold')) {
-                plot.currentOwner = newOwner;
-            } else if (plot.status === 'owned' && !newOwner) {
-                plot.currentOwner = 'You (Purchased)';
-            }
-
-            // Auto-calculate returns if sold
-            if (plot.status === 'sold' && plot.sellingPrice > 0) {
-                const totalCost = plot.price + plot.buyingExpenses;
-                const profit = plot.sellingPrice - totalCost - plot.sellingExpenses;
-                const totalInvestment = (plot.payments || [])
-                    .filter(p => p.type === 'investment')
-                    .reduce((sum, p) => sum + p.amount, 0);
-
-                const investorTotals = {};
-                (plot.payments || []).forEach(payment => {
-                    if (payment.type === 'investment') {
-                        investorTotals[payment.investor] = (investorTotals[payment.investor] || 0) + payment.amount;
-                    }
+            const editId = document.getElementById('editPlotId').value;
+            
+            if (editId) {
+                const plot = plots.find(p => p.id === parseInt(editId));
+                plot.name = name;
+                plot.plotNumber = plotNumber;
+                plot.surveyNumber = document.getElementById('surveyNumber').value;
+                plot.area = area;
+                plot.price = price;
+                plot.currentOwner = document.getElementById('currentOwner').value || 'Available';
+                plot.status = document.getElementById('plotStatus').value;
+                plot.advancePaid = parseInt(document.getElementById('advancePaid').value) || 0;
+                plot.description = document.getElementById('plotDescription').value;
+                showSuccess('Plot updated!');
+            } else {
+                plots.push({
+                    id: Math.max(0, ...plots.map(p => p.id)) + 1,
+                    name, plotNumber,
+                    surveyNumber: document.getElementById('surveyNumber').value,
+                    area, price,
+                    currentOwner: document.getElementById('currentOwner').value || 'Available',
+                    status: document.getElementById('plotStatus').value,
+                    advancePaid: parseInt(document.getElementById('advancePaid').value) || 0,
+                    description: document.getElementById('plotDescription').value,
+                    payments: []
                 });
-
-                Object.entries(investorTotals).forEach(([investor, invested]) => {
-                    const stake = invested / totalInvestment;
-                    const returnAmount = invested + (profit * stake);
-                    
-                    const existingReturn = (plot.payments || []).find(
-                        p => p.investor === investor && p.type === 'return'
-                    );
-                    
-                    if (!existingReturn) {
-                        if (!plot.payments) plot.payments = [];
-                        plot.payments.push({
-                            id: Date.now() + Math.random(),
-                            investor: investor,
-                            amount: returnAmount,
-                            type: 'return',
-                            date: new Date().toISOString().split('T')[0],
-                            notes: 'Profit distributed after sale'
-                        });
-                    }
-                });
+                showSuccess('Plot added!');
             }
 
             saveToLocalStorage();
-            closeModal('updatePlotModal');
-            showSuccess('Plot updated! Remember to sync with Google Sheets.');
-            loadDashboard();
+            closeModal('plotModal');
+            renderPlotsTable();
+            renderStats();
         }
 
-        function openAddPayment(plotId) {
+        function deletePlot(plotId) {
+            if (confirm('Delete this plot and all payments?')) {
+                plots = plots.filter(p => p.id !== plotId);
+                saveToLocalStorage();
+                renderPlotsTable();
+                renderStats();
+                showSuccess('Plot deleted!');
+            }
+        }
+
+        function editPayment(plotId, paymentId) {
+            const plot = plots.find(p => p.id === plotId);
+            const payment = plot.payments.find(p => p.id === paymentId);
+            document.getElementById('paymentModalTitle').textContent = 'Edit Payment';
+            document.getElementById('editPaymentId').value = paymentId;
             document.getElementById('paymentPlotId').value = plotId;
-            openModal('addPaymentModal');
+            document.getElementById('paymentInvestor').value = payment.investor;
+            document.getElementById('paymentAmount').value = payment.amount;
+            document.getElementById('paymentType').value = payment.type;
+            document.getElementById('paymentDate').value = payment.date;
+            document.getElementById('paymentNotes').value = payment.notes || '';
+            openModal('paymentModal');
         }
 
-        function addPayment() {
+        function savePayment() {
             const plotId = parseInt(document.getElementById('paymentPlotId').value);
-            const plot = plots.find(p => p.id === plotId);
+            const editId = document.getElementById('editPaymentId').value;
             const amount = parseInt(document.getElementById('paymentAmount').value);
+            const date = document.getElementById('paymentDate').value;
 
-            if (!amount || amount <= 0) {
-                alert('Please enter a valid amount');
+            if (!amount || !date) {
+                alert('Please fill required fields');
                 return;
             }
 
+            const plot = plots.find(p => p.id === plotId);
             if (!plot.payments) plot.payments = [];
-            
-            plot.payments.push({
-                id: Date.now(),
-                investor: document.getElementById('paymentInvestor').value,
-                amount: amount,
-                type: document.getElementById('paymentType').value,
-                date: document.getElementById('paymentDate').value,
-                notes: document.getElementById('paymentNotes').value || 'Payment'
-            });
+
+            if (editId) {
+                const payment = plot.payments.find(p => p.id === parseInt(editId));
+                payment.investor = document.getElementById('paymentInvestor').value;
+                payment.amount = amount;
+                payment.type = document.getElementById('paymentType').value;
+                payment.date = date;
+                payment.notes = document.getElementById('paymentNotes').value;
+                showSuccess('Payment updated!');
+            } else {
+                plot.payments.push({
+                    id: Date.now(),
+                    investor: document.getElementById('paymentInvestor').value,
+                    amount: amount,
+                    type: document.getElementById('paymentType').value,
+                    date: date,
+                    notes: document.getElementById('paymentNotes').value
+                });
+                showSuccess('Payment added!');
+            }
 
             saveToLocalStorage();
-            closeModal('addPaymentModal');
-            showSuccess('Payment added! Remember to sync with Google Sheets.');
-            loadDashboard();
+            closeModal('paymentModal');
+            if (currentView === 'payments') renderPaymentsView();
+            renderStats();
+        }
 
+        function deletePayment(plotId, paymentId) {
+            if (confirm('Delete this payment?')) {
+                const plot = plots.find(p => p.id === plotId);
+                plot.payments = plot.payments.filter(p => p.id !== paymentId);
+                saveToLocalStorage();
+                if (currentView === 'payments') renderPaymentsView();
+                renderStats();
+                showSuccess('Payment deleted!');
+            }
+        }
+
+        function openAddPaymentForPlot(plotId) {
+            document.getElementById('paymentModalTitle').textContent = 'Add Payment';
+            document.getElementById('editPaymentId').value = '';
+            document.getElementById('paymentPlotId').value = plotId;
             document.getElementById('paymentAmount').value = '';
             document.getElementById('paymentNotes').value = '';
+            document.getElementById('paymentDate').valueAsDate = new Date();
+            document.getElementById('paymentType').value = 'investment';
+            
+            const plot = plots.find(p => p.id === plotId);
+            const plotInfo = document.getElementById('plotInfo');
+            if (plotInfo) {
+                plotInfo.textContent = `Plot: ${plot.plotNumber} - ${plot.name}`;
+            }
+            
+            // Populate investor dropdown
+            populateInvestorDropdown();
+            
+            openModal('paymentModal');
         }
 
-        function showEmailNotification() {
-            alert('Email preview feature - copy your plot details and send to investors!');
+        function populateInvestorDropdown() {
+            const select = document.getElementById('paymentInvestor');
+            const investorsList = investors.filter(inv => inv.role === 'investor');
+            select.innerHTML = investorsList.map(inv => 
+                `<option value="${inv.id}">${inv.name}</option>`
+            ).join('');
         }
 
-        function copyEmail() {
-            alert('Email copied to clipboard!');
+        function openAddInvestor() {
+            document.getElementById('investorModalTitle').textContent = 'Add Investor';
+            document.getElementById('editInvestorId').value = '';
+            document.getElementById('investorName').value = '';
+            document.getElementById('investorUsername').value = '';
+            document.getElementById('investorPassword').value = '';
+            document.getElementById('investorEmail').value = '';
+            openModal('investorModal');
+        }
+
+        function editInvestor(investorId) {
+            const investor = investors.find(inv => inv.id === investorId);
+            document.getElementById('investorModalTitle').textContent = 'Edit Investor';
+            document.getElementById('editInvestorId').value = investorId;
+            document.getElementById('investorName').value = investor.name;
+            document.getElementById('investorUsername').value = investor.username;
+            document.getElementById('investorPassword').value = investor.password;
+            document.getElementById('investorEmail').value = investor.email || '';
+            openModal('investorModal');
+        }
+
+        function saveInvestor() {
+            const name = document.getElementById('investorName').value.trim();
+            const username = document.getElementById('investorUsername').value.trim();
+            const password = document.getElementById('investorPassword').value;
+            const email = document.getElementById('investorEmail').value.trim();
+
+            if (!name || !username || !password) {
+                alert('Please fill all required fields (Name, Username, Password)');
+                return;
+            }
+
+            const editId = document.getElementById('editInvestorId').value;
+            
+            // Check for duplicate username
+            const duplicate = investors.find(inv => 
+                inv.username === username && inv.id !== editId
+            );
+            
+            if (duplicate) {
+                alert('Username already exists. Please choose a different username.');
+                return;
+            }
+
+            if (editId) {
+                // Edit existing investor
+                const investor = investors.find(inv => inv.id === editId);
+                investor.name = name;
+                investor.username = username;
+                investor.password = password;
+                investor.email = email;
+                showSuccess('Investor updated!');
+            } else {
+                // Add new investor
+                const newId = 'investor' + (investors.filter(i => i.role === 'investor').length + 1);
+                investors.push({
+                    id: newId,
+                    name: name,
+                    username: username,
+                    password: password,
+                    role: 'investor',
+                    email: email
+                });
+                showSuccess('Investor added!');
+            }
+
+            buildUsersObject();
+            saveInvestorsToLocalStorage();
+            closeModal('investorModal');
+            if (currentView === 'investors') renderInvestorsView();
+        }
+
+        function deleteInvestor(investorId) {
+            // Check if investor has any investments
+            const hasInvestments = plots.some(p => 
+                (p.payments || []).some(pay => pay.investor === investorId)
+            );
+
+            if (hasInvestments) {
+                alert('Cannot delete investor with existing investments. Please remove their payments first.');
+                return;
+            }
+
+            if (confirm('Are you sure you want to delete this investor?')) {
+                investors = investors.filter(inv => inv.id !== investorId);
+                buildUsersObject();
+                saveInvestorsToLocalStorage();
+                renderInvestorsView();
+                showSuccess('Investor deleted!');
+            }
+        }
+
+        function saveInvestorsToLocalStorage() {
+            localStorage.setItem('investorsData', JSON.stringify(investors));
+        }
+
+        function loadInvestorsFromLocalStorage() {
+            const saved = localStorage.getItem('investorsData');
+            if (saved) {
+                investors = JSON.parse(saved);
+                buildUsersObject();
+            }
+        }
+
+        function changeAdminPassword() {
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            openModal('changePasswordModal');
+        }
+
+        function saveNewPassword() {
+            const currentPwd = document.getElementById('currentPassword').value;
+            const newPwd = document.getElementById('newPassword').value;
+            const confirmPwd = document.getElementById('confirmPassword').value;
+
+            if (!currentPwd || !newPwd || !confirmPwd) {
+                alert('Please fill all fields');
+                return;
+            }
+
+            // Verify current password
+            const admin = investors.find(inv => inv.id === 'admin');
+            if (admin.password !== currentPwd) {
+                alert('Current password is incorrect');
+                return;
+            }
+
+            // Check if new passwords match
+            if (newPwd !== confirmPwd) {
+                alert('New passwords do not match');
+                return;
+            }
+
+            // Check password strength (minimum 6 characters)
+            if (newPwd.length < 6) {
+                alert('Password must be at least 6 characters long');
+                return;
+            }
+
+            // Update password
+            admin.password = newPwd;
+            buildUsersObject();
+            saveInvestorsToLocalStorage();
+            
+            closeModal('changePasswordModal');
+            showSuccess('Admin password updated successfully! Remember to sync to save to Google Sheets.');
         }
 
         function showSuccess(message) {
             const el = document.getElementById('successMessage');
             el.textContent = message;
             el.style.display = 'block';
-            setTimeout(() => el.style.display = 'none', 4000);
+            setTimeout(() => el.style.display = 'none', 3000);
         }
 
         function showError(message) {
