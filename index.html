@@ -1216,6 +1216,9 @@
                         <button class="nav-item" onclick="showDistributions()">
                             <span class="nav-icon">📈</span> Distributions
                         </button>
+                        <button class="nav-item" onclick="showFundsHeld()">
+                            <span class="nav-icon">🏦</span> Funds Held
+                        </button>
                     </div>
                 `;
             } else {
@@ -1257,10 +1260,12 @@
             }, 0);
             
             const totalRealized = deals.filter(d => d.status === 'sold').reduce((sum, deal) => {
-                const totalInv = deal.investments.reduce((s, inv) => s + inv.amount, 0);
                 const profit = (deal.sellingPrice - deal.sellingExpenses) - (deal.purchasePrice + deal.buyingExpenses);
                 return sum + profit;
             }, 0);
+
+            // Total funds currently held by the company from all investors (excludes wallet = already paid)
+            const fundsHeld = computeFundsHeld().total;
             
             const html = `
                 <div style="margin-bottom: 24px;">
@@ -1285,6 +1290,11 @@
                         <div class="stat-value" style="color: ${totalRealized >= 0 ? 'var(--success)' : 'var(--danger)'}">
                             ${formatCurrency(totalRealized)}
                         </div>
+                    </div>
+                    <div class="stat-card" style="border-top: 3px solid var(--warning); cursor:pointer;" onclick="showFundsHeld()">
+                        <div class="stat-label">🏦 Total Funds Held</div>
+                        <div class="stat-value" style="color:var(--warning)">${formatCurrency(fundsHeld)}</div>
+                        <div style="font-size:11px;color:var(--primary);font-weight:600;margin-top:6px;">View Full Report →</div>
                     </div>
                 </div>
                 
@@ -3204,6 +3214,208 @@
                 const modal = document.getElementById(modalId);
                 if (modal) modal.classList.add('active');
             }, 10);
+        }
+
+        // ── Funds Held Report ─────────────────────────────────────────
+
+        /**
+         * Computes how much money the company holds from each investor.
+         * Three buckets per investor:
+         *   1. Capital locked in ACTIVE deals (not yet sold — company holds the invested capital)
+         *   2. Unpaid entitlement on SOLD deals (profit+capital due but not yet paid out)
+         *   3. Wallet balance (credited to wallet but not yet withdrawn)
+         * Returns { rows: [...], total }
+         */
+        function computeFundsHeld() {
+            const rows = investors.filter(i => i.role === 'investor').map(inv => {
+                const wallet = wallets.find(w => w.investorId === inv.id) || { balance: 0, transactions: [] };
+
+                // --- Capital in active (unsold) deals ---
+                let activeCapital = 0;
+                deals.filter(d => d.status !== 'sold').forEach(deal => {
+                    const myInv = deal.investments.find(x => x.investorId === inv.id);
+                    if (myInv) activeCapital += myInv.amount;
+                });
+
+                // --- Unpaid entitlement on sold deals ---
+                let unpaidEntitlement = 0;
+                const dealBreakdown = [];
+                deals.filter(d => d.status === 'sold' && d.sellingPrice > 0).forEach(deal => {
+                    const myInv = deal.investments.find(x => x.investorId === inv.id);
+                    if (!myInv) return;
+                    const totalDealInv = deal.investments.reduce((s, x) => s + x.amount, 0);
+                    const myShare     = totalDealInv > 0 ? myInv.amount / totalDealInv : 0;
+                    const netProceeds = deal.sellingPrice - (deal.sellingExpenses || 0);
+                    const dealProfit  = netProceeds - (deal.purchasePrice + (deal.buyingExpenses || 0));
+                    const entitlement = myInv.amount + (dealProfit * myShare);
+                    const paid        = wallet.transactions
+                        .filter(t => t.type === 'credit' && t.dealId === deal.id)
+                        .reduce((s, t) => s + t.amount, 0);
+                    const unpaid = Math.max(0, entitlement - paid);
+                    if (unpaid > 0 || entitlement > 0) {
+                        dealBreakdown.push({ dealName: deal.name, entitlement, paid, unpaid });
+                    }
+                    unpaidEntitlement += unpaid;
+                });
+
+                const totalHeld = activeCapital + unpaidEntitlement;
+
+                return {
+                    investor: inv,
+                    activeCapital,
+                    unpaidEntitlement,
+                    totalHeld,
+                    dealBreakdown
+                };
+            });
+
+            const total = rows.reduce((s, r) => s + r.totalHeld, 0);
+            return { rows, total };
+        }
+
+        function showFundsHeld() {
+            clearActiveNav();
+            // Highlight Funds Held nav item if present
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                if (btn.textContent.includes('Funds Held')) btn.classList.add('active');
+            });
+
+            document.getElementById('pageTitle').textContent = 'Funds Held Report';
+            document.getElementById('pageSubtitle').textContent = 'Cumulative investor money currently held by the company';
+
+            const { rows, total } = computeFundsHeld();
+
+            // Summary breakdown totals
+            const totalActive      = rows.reduce((s, r) => s + r.activeCapital, 0);
+            const totalUnpaid      = rows.reduce((s, r) => s + r.unpaidEntitlement, 0);
+
+            const html = `
+                <div style="margin-bottom:20px;">
+                    <button class="btn btn-secondary btn-sm" onclick="showAdminDashboard()">← Back to Dashboard</button>
+                </div>
+
+                <!-- Summary strip -->
+                <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit,minmax(200px,1fr));margin-bottom:28px;">
+                    <div class="stat-card" style="border-top:3px solid var(--warning)">
+                        <div class="stat-label">🏦 Total Funds Held</div>
+                        <div class="stat-value" style="color:var(--warning)">${formatCurrency(total)}</div>
+                        <div style="font-size:12px;color:var(--text-light);margin-top:4px">across all investors</div>
+                    </div>
+                    <div class="stat-card" style="border-top:3px solid var(--secondary)">
+                        <div class="stat-label">🔒 Locked in Active Deals</div>
+                        <div class="stat-value" style="color:var(--secondary)">${formatCurrency(totalActive)}</div>
+                        <div style="font-size:12px;color:var(--text-light);margin-top:4px">capital not yet sold</div>
+                    </div>
+                    <div class="stat-card" style="border-top:3px solid var(--danger)">
+                        <div class="stat-label">⏳ Unpaid Entitlements</div>
+                        <div class="stat-value" style="color:var(--danger)">${formatCurrency(totalUnpaid)}</div>
+                        <div style="font-size:12px;color:var(--text-light);margin-top:4px">sold deals, pending payout</div>
+                    </div>
+                </div>
+
+                <!-- Per-investor table -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">📋 Investor-wise Breakdown</h3>
+                        <span style="font-size:13px;color:var(--text-light)">Click a row to expand deal details</span>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Investor</th>
+                                <th style="text-align:right">🔒 Active Capital</th>
+                                <th style="text-align:right">⏳ Unpaid (sold deals)</th>
+                                <th style="text-align:right">🏦 Total Held</th>
+                                <th style="text-align:center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows.map((r, idx) => `
+                                <tr style="cursor:pointer" onclick="toggleFundsRow(${idx})">
+                                    <td>
+                                        <div style="font-weight:600">${r.investor.name}</div>
+                                        <div style="font-size:12px;color:var(--text-light)">${r.investor.email || ''}</div>
+                                    </td>
+                                    <td style="text-align:right;color:var(--secondary);font-weight:600">${formatCurrency(r.activeCapital)}</td>
+                                    <td style="text-align:right;color:var(--danger);font-weight:600">${formatCurrency(r.unpaidEntitlement)}</td>
+                                    <td style="text-align:right">
+                                        <strong style="font-size:16px;color:var(--warning)">${formatCurrency(r.totalHeld)}</strong>
+                                    </td>
+                                    <td style="text-align:center">
+                                        <span id="fundsArrow${idx}" style="font-size:18px;color:var(--text-light)">▶</span>
+                                    </td>
+                                </tr>
+                                <tr id="fundsDetail${idx}" style="display:none;background:#FAFBFC">
+                                    <td colspan="5" style="padding:0 16px 16px">
+                                        ${r.dealBreakdown.length === 0 && r.activeCapital === 0
+                                            ? `<div style="color:var(--text-light);font-size:13px;padding:12px 0">No funds held for this investor.</div>`
+                                            : `
+                                            <div style="padding-top:12px">
+                                                ${r.activeCapital > 0 ? `
+                                                <div style="margin-bottom:10px;font-size:13px;">
+                                                    <span style="font-weight:600;color:var(--secondary)">Capital in Active Deals: </span>
+                                                    ${formatCurrency(r.activeCapital)}
+                                                    <span style="color:var(--text-light)"> — locked until deal is sold</span>
+                                                </div>` : ''}
+                                                ${r.dealBreakdown.length > 0 ? `
+                                                <div style="font-weight:600;font-size:12px;color:var(--text-light);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Sold Deal Breakdown</div>
+                                                <table style="width:100%;font-size:13px;">
+                                                    <thead style="background:#F1F5F9">
+                                                        <tr>
+                                                            <th style="padding:8px 10px;text-align:left;font-size:11px">Deal</th>
+                                                            <th style="padding:8px 10px;text-align:right;font-size:11px">Total Entitlement</th>
+                                                            <th style="padding:8px 10px;text-align:right;font-size:11px">Already Paid</th>
+                                                            <th style="padding:8px 10px;text-align:right;font-size:11px">Still Owed</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        ${r.dealBreakdown.map(db => `
+                                                        <tr>
+                                                            <td style="padding:8px 10px;border-bottom:1px solid #F1F5F9">${db.dealName}</td>
+                                                            <td style="padding:8px 10px;border-bottom:1px solid #F1F5F9;text-align:right">${formatCurrency(db.entitlement)}</td>
+                                                            <td style="padding:8px 10px;border-bottom:1px solid #F1F5F9;text-align:right;color:var(--success)">${formatCurrency(db.paid)}</td>
+                                                            <td style="padding:8px 10px;border-bottom:1px solid #F1F5F9;text-align:right;color:${db.unpaid > 0 ? 'var(--danger)' : 'var(--success)'};font-weight:600">${formatCurrency(db.unpaid)}</td>
+                                                        </tr>`).join('')}
+                                                    </tbody>
+                                                </table>` : ''}
+                                            </div>`
+                                        }
+                                    </td>
+                                </tr>
+                            `).join('')}
+                            <!-- Totals row -->
+                            <tr style="background:var(--primary-light);font-weight:700;border-top:2px solid var(--border)">
+                                <td>Total (All Investors)</td>
+                                <td style="text-align:right;color:var(--secondary)">${formatCurrency(totalActive)}</td>
+                                <td style="text-align:right;color:var(--danger)">${formatCurrency(totalUnpaid)}</td>
+                                <td style="text-align:right;font-size:18px;color:var(--warning)">${formatCurrency(total)}</td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Explanation card -->
+                <div class="content-card" style="border-left:4px solid var(--primary)">
+                    <div class="card-title" style="margin-bottom:12px;font-size:15px">📖 How "Funds Held" is Calculated</div>
+                    <div style="font-size:14px;color:var(--text-dark);line-height:1.7">
+                        <p style="margin-bottom:8px"><strong>🔒 Active Capital</strong> — Money invested by an investor in deals that haven't been sold yet. The company holds this until the plot is sold.</p>
+                        <p style="margin-bottom:8px"><strong>⏳ Unpaid Entitlements</strong> — For sold deals, each investor is entitled to their share of capital + profit. This shows how much of that entitlement has <em>not yet been paid out</em> (not credited to wallet).</p>
+                        <p><strong>Note:</strong> Once an amount is credited to an investor's wallet, it is considered <em>paid</em> and is no longer counted as company-held funds.</p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('mainContent').innerHTML = html;
+        }
+
+        function toggleFundsRow(idx) {
+            const detail = document.getElementById('fundsDetail' + idx);
+            const arrow  = document.getElementById('fundsArrow' + idx);
+            const open   = detail.style.display !== 'none' && detail.style.display !== '';
+            detail.style.display = open ? 'none' : 'table-row';
+            arrow.textContent    = open ? '▶' : '▼';
+            arrow.style.color    = open ? 'var(--text-light)' : 'var(--primary)';
         }
     </script>
 </body>
