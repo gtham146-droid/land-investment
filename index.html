@@ -859,7 +859,7 @@
     <script>
         // ── Google Sheets backend URL ───────────────────────────────
         // Paste your Web App URL here after deploying the Apps Script
-        const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwxKEoMH8Xp6P3ViujscgPsvmX_Q_o1Cn3KHK72UdV-WvaWDCA-2F-TpeXXcHGpXDWzBA/exec';
+        const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwxKEoMH8Xp6P3ViujscgPsvmX_Q_o1Cn3KHK72UdV-WvaWDCA-2F-TpeXXcHGpXDWzBA/exec'; // Set your Google Apps Script URL here to enable cloud sync
         // ────────────────────────────────────────────────────────────
 
         // Data structures
@@ -986,6 +986,13 @@
 
             if (!inv || !dl) initializeData();
 
+            // Ensure every investor has a wallet (repair missing wallets from old data)
+            investors.filter(i => i.role === 'investor').forEach(inv => {
+                if (!wallets.find(w => w.investorId === inv.id)) {
+                    wallets.push({ investorId: inv.id, balance: 0, transactions: [] });
+                }
+            });
+
             // 2. If sheet URL is set, pull latest data from sheet in background
             if (SHEET_URL && SHEET_URL !== 'YOUR_WEB_APP_URL_HERE') {
                 _sheetEnabled = true;
@@ -1052,8 +1059,9 @@
                     }
                 })
                 .catch(err => {
-                    showSyncStatus('⚠ Load failed: ' + err.message, 'error');
-                    console.error('Pull error:', err);
+                    // Sheet unavailable — silently fall back to localStorage data
+                    console.warn('Sheet sync skipped:', err.message);
+                    showSyncStatus('', 'info');
                 });
         }
 
@@ -2593,6 +2601,7 @@
                                         </td>
                                         <td>
                                             ${fullyPaid ? '<span style="color:var(--success);font-size:13px">✓ Done</span>' : '<button class="btn btn-primary btn-sm" onclick="distributeToWallet(\'' + deal.id + '\',\'' + inv.investorId + '\',' + entitlement + ')">Pay to Wallet</button>'}
+                                        </td>
                                     </tr>
                                 `;
                             }).join('')}
@@ -3039,8 +3048,11 @@
         
         // Helper function to add transaction to wallet
         function addWalletTransaction(investorId, amount, type, description, dealId) {
-            const wallet = wallets.find(w => w.investorId === investorId);
-            if (!wallet) return;
+            let wallet = wallets.find(w => w.investorId === investorId);
+            if (!wallet) {
+                wallet = { investorId: investorId, balance: 0, transactions: [] };
+                wallets.push(wallet);
+            }
             
             const balanceBefore = wallet.balance;
             wallet.balance = type === 'credit' ? balanceBefore + amount : balanceBefore - amount;
@@ -3061,10 +3073,18 @@
         function distributeToWallet(dealId, investorId, entitlement) {
             const deal = deals.find(d => d.id === dealId);
             const investor = investors.find(i => i.id === investorId);
-            if (!deal || !investor) return;
+            if (!deal || !investor) {
+                showMessage('Deal or investor not found', 'error');
+                return;
+            }
             
-            const wallet = wallets.find(w => w.investorId === investorId);
-            if (!wallet) return;
+            // Auto-create wallet if missing (handles legacy data or import edge cases)
+            let wallet = wallets.find(w => w.investorId === investorId);
+            if (!wallet) {
+                wallet = { investorId: investorId, balance: 0, transactions: [] };
+                wallets.push(wallet);
+                saveAllData();
+            }
             
             const alreadyPaid = wallet.transactions
                 .filter(t => t.type === 'credit' && t.dealId === dealId)
