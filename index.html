@@ -3317,7 +3317,7 @@
                 <div class="content-card">
                     <div class="card-header">
                         <h3 class="card-title">📋 Investor-wise Breakdown</h3>
-                        <span style="font-size:13px;color:var(--text-light)">Click a row to expand deal details</span>
+                        <button class="btn btn-primary btn-sm" onclick="notifyAllInvestors()">📧 Notify All</button>
                     </div>
                     <table>
                         <thead>
@@ -3326,15 +3326,16 @@
                                 <th style="text-align:right">🔒 Active Capital</th>
                                 <th style="text-align:right">⏳ Unpaid (sold deals)</th>
                                 <th style="text-align:right">🏦 Total Held</th>
-                                <th style="text-align:center">Action</th>
+                                <th style="text-align:center">Statement</th>
+                                <th style="text-align:center">Details</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${rows.map((r, idx) => `
-                                <tr style="cursor:pointer" onclick="toggleFundsRow(${idx})">
+                                <tr>
                                     <td>
                                         <div style="font-weight:600">${r.investor.name}</div>
-                                        <div style="font-size:12px;color:var(--text-light)">${r.investor.email || ''}</div>
+                                        <div style="font-size:12px;color:var(--text-light)">${r.investor.email || '<span style="color:var(--danger)">no email</span>'}</div>
                                     </td>
                                     <td style="text-align:right;color:var(--secondary);font-weight:600">${formatCurrency(r.activeCapital)}</td>
                                     <td style="text-align:right;color:var(--danger);font-weight:600">${formatCurrency(r.unpaidEntitlement)}</td>
@@ -3342,11 +3343,18 @@
                                         <strong style="font-size:16px;color:var(--warning)">${formatCurrency(r.totalHeld)}</strong>
                                     </td>
                                     <td style="text-align:center">
+                                        <button class="btn btn-secondary btn-sm"
+                                            onclick="openEmailPreview('${r.investor.id}')"
+                                            ${!r.investor.email ? 'disabled title="No email on file"' : ''}>
+                                            📧 Send
+                                        </button>
+                                    </td>
+                                    <td style="text-align:center;cursor:pointer" onclick="toggleFundsRow(${idx})">
                                         <span id="fundsArrow${idx}" style="font-size:18px;color:var(--text-light)">▶</span>
                                     </td>
                                 </tr>
                                 <tr id="fundsDetail${idx}" style="display:none;background:#FAFBFC">
-                                    <td colspan="5" style="padding:0 16px 16px">
+                                    <td colspan="6" style="padding:0 16px 16px">
                                         ${r.dealBreakdown.length === 0 && r.activeCapital === 0
                                             ? `<div style="color:var(--text-light);font-size:13px;padding:12px 0">No funds held for this investor.</div>`
                                             : `
@@ -3390,6 +3398,7 @@
                                 <td style="text-align:right;color:var(--danger)">${formatCurrency(totalUnpaid)}</td>
                                 <td style="text-align:right;font-size:18px;color:var(--warning)">${formatCurrency(total)}</td>
                                 <td></td>
+                                <td></td>
                             </tr>
                         </tbody>
                     </table>
@@ -3416,6 +3425,264 @@
             detail.style.display = open ? 'none' : 'table-row';
             arrow.textContent    = open ? '▶' : '▼';
             arrow.style.color    = open ? 'var(--text-light)' : 'var(--primary)';
+        }
+
+        // ── Email Statement ───────────────────────────────────────────
+
+        function buildEmailBody(inv, row) {
+            const lines = [];
+            lines.push('Dear ' + inv.name + ',');
+            lines.push('');
+            lines.push('Here is a summary of your current investment status with PropVault:');
+            lines.push('');
+            lines.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            lines.push('FUNDS HELD BY COMPANY');
+            lines.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+            if (row.activeCapital > 0) {
+                lines.push('🔒 Capital in Active Deals : ' + formatCurrency(row.activeCapital));
+            }
+            if (row.unpaidEntitlement > 0) {
+                lines.push('⏳ Pending Payout (sold)   : ' + formatCurrency(row.unpaidEntitlement));
+            }
+            lines.push('─────────────────────────────────');
+            lines.push('🏦 Total Held               : ' + formatCurrency(row.totalHeld));
+            lines.push('');
+
+            if (row.dealBreakdown.length > 0) {
+                lines.push('DEAL-WISE BREAKDOWN (Sold Deals)');
+                lines.push('─────────────────────────────────');
+                row.dealBreakdown.forEach(db => {
+                    lines.push('Deal     : ' + db.dealName);
+                    lines.push('Entitled : ' + formatCurrency(db.entitlement));
+                    lines.push('Paid     : ' + formatCurrency(db.paid));
+                    lines.push('Owed     : ' + formatCurrency(db.unpaid));
+                    lines.push('');
+                });
+            }
+
+            lines.push('For any queries, please contact us.');
+            lines.push('');
+            lines.push('Regards,');
+            lines.push('PropVault Admin Team');
+
+            return lines.join('\n');
+        }
+
+        function openEmailPreview(investorId) {
+            const inv = investors.find(i => i.id === investorId);
+            if (!inv) return;
+
+            const { rows } = computeFundsHeld();
+            const row = rows.find(r => r.investor.id === investorId);
+            if (!row) return;
+
+            if (!inv.email) {
+                showMessage('No email address on file for ' + inv.name + '. Please update their profile first.', 'error');
+                return;
+            }
+
+            const subject = 'PropVault — Your Investment Statement';
+            const body    = buildEmailBody(inv, row);
+
+            const modalHtml = `
+                <div class="modal active" id="emailPreviewModal">
+                    <div class="modal-content" style="max-width:580px">
+                        <div class="modal-header">
+                            <h3 class="modal-title">📧 Preview & Send Statement</h3>
+                            <button class="close-btn" onclick="closeModal('emailPreviewModal')">&times;</button>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">To</label>
+                            <input type="text" class="form-input" value="${inv.email}" readonly
+                                style="background:var(--bg-main);color:var(--text-light)">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Subject</label>
+                            <input type="text" id="emailSubject" class="form-input" value="${subject}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Message</label>
+                            <textarea id="emailBody" class="form-input form-textarea"
+                                rows="16" style="font-family:monospace;font-size:13px;line-height:1.6">${body}</textarea>
+                        </div>
+
+                        <div id="emailSendStatus" style="display:none;margin-bottom:12px"></div>
+
+                        <div style="display:flex;gap:12px">
+                            <button class="btn btn-primary" style="flex:1"
+                                onclick="confirmSendEmail('${investorId}')">
+                                📤 Send Email
+                            </button>
+                            <button class="btn btn-secondary"
+                                onclick="closeModal('emailPreviewModal')">Cancel</button>
+                        </div>
+
+                        ${!_sheetEnabled ? `
+                        <div style="margin-top:14px;padding:10px 14px;background:#fef3c7;border-radius:8px;font-size:13px;color:#92400e">
+                            ⚠ Google Sheet URL not configured — email will not send until SHEET_URL is set.
+                        </div>` : ''}
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        async function notifyAllInvestors() {
+            if (!_sheetEnabled) {
+                showMessage('Google Sheet URL not configured. Cannot send emails.', 'error');
+                return;
+            }
+
+            const { rows } = computeFundsHeld();
+            const eligible = rows.filter(r => r.investor.email && r.totalHeld > 0);
+
+            if (eligible.length === 0) {
+                showMessage('No investors with a valid email address and outstanding funds found.', 'info');
+                return;
+            }
+
+            // Confirm dialog
+            const modalHtml = `
+                <div class="modal active" id="notifyAllModal">
+                    <div class="modal-content" style="max-width:460px">
+                        <div class="modal-header">
+                            <h3 class="modal-title">📧 Notify All Investors</h3>
+                            <button class="close-btn" onclick="closeModal('notifyAllModal')">&times;</button>
+                        </div>
+                        <p style="font-size:14px;color:var(--text-dark);margin-bottom:16px">
+                            This will send a funds-held statement to <strong>${eligible.length} investor${eligible.length > 1 ? 's' : ''}</strong>:
+                        </p>
+                        <div style="background:var(--bg-main);border-radius:10px;padding:12px;margin-bottom:20px;font-size:13px;">
+                            ${eligible.map(r => `
+                                <div style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between">
+                                    <span style="font-weight:600">${r.investor.name}</span>
+                                    <span style="color:var(--text-light)">${r.investor.email}</span>
+                                </div>`).join('')}
+                        </div>
+                        <div id="notifyAllProgress" style="display:none;margin-bottom:16px"></div>
+                        <div style="display:flex;gap:12px">
+                            <button id="notifyAllConfirmBtn" class="btn btn-primary" style="flex:1"
+                                onclick="executeNotifyAll()">
+                                📤 Send to All
+                            </button>
+                            <button class="btn btn-secondary" onclick="closeModal('notifyAllModal')">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        async function executeNotifyAll() {
+            const { rows } = computeFundsHeld();
+            const eligible = rows.filter(r => r.investor.email && r.totalHeld > 0);
+            const btn      = document.getElementById('notifyAllConfirmBtn');
+            const progress = document.getElementById('notifyAllProgress');
+
+            btn.disabled    = true;
+            btn.textContent = '⏳ Sending…';
+            progress.style.display = 'block';
+
+            let sent = 0, failed = 0;
+
+            for (const row of eligible) {
+                const inv     = row.investor;
+                const subject = 'PropVault — Your Investment Statement';
+                const body    = buildEmailBody(inv, row);
+
+                progress.innerHTML = `
+                    <div style="background:#dbeafe;color:#1e40af;padding:10px 14px;border-radius:8px;font-size:13px">
+                        Sending ${sent + failed + 1} of ${eligible.length}: ${inv.name}…
+                    </div>`;
+
+                try {
+                    const url = SHEET_URL
+                        + '?action=sendEmail'
+                        + '&to='      + encodeURIComponent(inv.email)
+                        + '&subject=' + encodeURIComponent(subject)
+                        + '&body='    + encodeURIComponent(body);
+
+                    const res = await fetch(url, { method: 'GET' }).then(r => r.json());
+                    if (res.ok) { sent++; } else { throw new Error(res.error); }
+                } catch (e) {
+                    failed++;
+                    console.error('Failed to email ' + inv.name + ':', e);
+                }
+
+                // Small delay to avoid Apps Script rate limits
+                await new Promise(resolve => setTimeout(resolve, 800));
+            }
+
+            progress.innerHTML = `
+                <div style="background:${failed === 0 ? '#d1fae5' : '#fef3c7'};
+                            color:${failed === 0 ? '#065f46' : '#92400e'};
+                            padding:10px 14px;border-radius:8px;font-size:13px">
+                    ${failed === 0
+                        ? `✓ All ${sent} emails sent successfully!`
+                        : `✓ ${sent} sent, ✗ ${failed} failed. Check console for details.`}
+                </div>`;
+            btn.textContent = '✓ Done';
+            showMessage(sent + ' statement email' + (sent > 1 ? 's' : '') + ' sent successfully.', 'success');
+            setTimeout(() => closeModal('notifyAllModal'), 2500);
+        }
+
+        function confirmSendEmail(investorId) {
+            const inv     = investors.find(i => i.id === investorId);
+            const subject = document.getElementById('emailSubject').value.trim();
+            const body    = document.getElementById('emailBody').value.trim();
+            const btn     = document.querySelector('#emailPreviewModal .btn-primary');
+            const status  = document.getElementById('emailSendStatus');
+
+            if (!subject || !body) {
+                showMessage('Subject and message cannot be empty.', 'error');
+                return;
+            }
+
+            if (!_sheetEnabled) {
+                showMessage('Google Sheet URL not configured. Cannot send email.', 'error');
+                return;
+            }
+
+            // Disable button, show sending state
+            btn.disabled     = true;
+            btn.textContent  = '⏳ Sending…';
+            status.style.display = 'block';
+            status.style.background  = '#dbeafe';
+            status.style.color       = '#1e40af';
+            status.style.padding     = '10px 14px';
+            status.style.borderRadius = '8px';
+            status.style.fontSize    = '13px';
+            status.textContent = 'Sending email via Google Apps Script…';
+
+            const url = SHEET_URL
+                + '?action=sendEmail'
+                + '&to='      + encodeURIComponent(inv.email)
+                + '&subject=' + encodeURIComponent(subject)
+                + '&body='    + encodeURIComponent(body);
+
+            fetch(url, { method: 'GET' })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.ok) {
+                        status.style.background = '#d1fae5';
+                        status.style.color      = '#065f46';
+                        status.textContent      = '✓ Email sent successfully to ' + inv.email;
+                        btn.textContent         = '✓ Sent!';
+                        showMessage('Statement emailed to ' + inv.name + ' (' + inv.email + ')', 'success');
+                        setTimeout(() => closeModal('emailPreviewModal'), 2000);
+                    } else {
+                        throw new Error(res.error || 'Unknown error from Apps Script');
+                    }
+                })
+                .catch(err => {
+                    status.style.background = '#fee2e2';
+                    status.style.color      = '#991b1b';
+                    status.textContent      = '✗ Failed: ' + err.message;
+                    btn.disabled    = false;
+                    btn.textContent = '📤 Retry Send';
+                });
         }
     </script>
 </body>
